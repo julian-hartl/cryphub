@@ -198,13 +198,15 @@ class CurrencyCard extends StatelessWidget {
   }
 
   Container _growthRateBox() {
-    final noGrowth = cryptoCurrency.percentChange24h == 0.0;
+    final noGrowth =
+        double.parse(cryptoCurrency.percentChange24h.toStringAsFixed(2)) ==
+            0.00;
     final isPositiveGrowth = !cryptoCurrency.percentChange24h.isNegative;
     final color = noGrowth
         ? noGrowthColor
         : (isPositiveGrowth ? positiveGrowthColor : negativeGrowthColor);
     final icon = noGrowth
-        ? Icons.arrow_right
+        ? Icons.horizontal_rule
         : (isPositiveGrowth ? Icons.arrow_upward : Icons.arrow_downward);
     return Container(
       child: Row(

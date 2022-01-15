@@ -1,5 +1,9 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:cryphub/application/screens/settings_screen/settings_screen.dart';
 import 'package:cryphub/application/widgets/expandable_sidebar.dart';
+import 'package:gap/gap.dart';
 
+import '../../app_router.dart';
 import '../../blocs/favorite_currencies/favorite_currencies_bloc.dart';
 import '../../blocs/favorite_currencies_notifier/favorite_currencies_notifier_bloc.dart';
 import '../../blocs/latest_currencies/latest_currencies_bloc.dart';
@@ -61,11 +65,74 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
     super.dispose();
   }
 
+  final ExpandableSidebarController sidebarController =
+      ExpandableSidebarController();
+
   @override
   Widget build(BuildContext context) {
-    return ExpandableSidebar(
-      child: Scaffold(
-        body: RefreshIndicator(
+    return Scaffold(
+      body: ExpandableSidebar(
+        controller: sidebarController,
+        openBySwipe: true,
+        sidebarWidth: MediaQuery.of(context).size.width * 0.8,
+        sidebarColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: Theme.of(context).colorScheme.background,
+        sidebar: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    sidebarController.closeSidebar();
+                  },
+                  child: Icon(
+                    Icons.menu,
+                    size: 50,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onBackground
+                        .withOpacity(0.9),
+                  ),
+                ),
+                const Gap(10),
+                const Text(
+                  'Hello!',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30.0,
+                    letterSpacing: 2,
+                  ),
+                ),
+                const Divider(
+                  height: 25,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    // Navigator.of(context).push(MaterialPageRoute(
+                    //   builder: (context) => SettingsScreen(),
+                    // ));
+                    context.router.push(const SettingsScreenRoute());
+                  },
+                  child: Row(
+                    children: const [
+                      Icon(Icons.settings),
+                      Gap(10),
+                      Text(
+                        'Settings',
+                        style: TextStyle(
+                          fontSize: 19,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+        child: RefreshIndicator(
           onRefresh: () async {
             pagingController.refresh();
           },
@@ -76,7 +143,9 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                   'Home'.toUpperCase(),
                 ),
                 leading: IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    sidebarController.toggleSidebar();
+                  },
                   icon: const Icon(Icons.menu),
                 ),
                 floating: true,

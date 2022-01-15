@@ -54,3 +54,4 @@ links.txt
 *.g.dart
 *.config.dart
 *.mocks.dart
+*.gr.dart

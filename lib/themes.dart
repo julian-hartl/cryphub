@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 const _darkBg = Color(0xFF272829);
+const _darkOnBg = Color(0xFFFEFEFE);
 ThemeData dark(BuildContext context) => ThemeData(
       colorScheme: const ColorScheme.dark(
         background: _darkBg,
         surface: Color(0xFF979A9B),
         primary: Color(0xFF31E384),
+        onBackground: _darkOnBg,
       ),
       fontFamily: GoogleFonts.aBeeZee().fontFamily,
       scaffoldBackgroundColor: _darkBg,
-      textTheme: GoogleFonts.robotoTextTheme().copyWith(),
+      textTheme: GoogleFonts.robotoTextTheme().copyWith(
+        bodyText2: TextStyle(color: _darkOnBg),
+      ),
     );
 
 const _lightBg = Color(0xFFFEFEFE);

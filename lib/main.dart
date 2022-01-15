@@ -15,5 +15,5 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  runApp(const Cryphub());
+  runApp(Cryphub());
 }
