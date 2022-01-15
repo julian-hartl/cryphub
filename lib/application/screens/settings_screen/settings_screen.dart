@@ -1,4 +1,5 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -27,6 +28,16 @@ class SettingsScreenContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            GestureDetector(
+              onTap: () {
+                AutoRouter.of(context).pop();
+              },
+              child: const Icon(
+                Icons.arrow_back_ios,
+                size: 30,
+              ),
+            ),
+            const Gap(30),
             Text(
               'Settings',
               style: TextStyle(

@@ -149,8 +149,6 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
     });
 
     sidebarAnimationController.addListener(() {
-      debugPrint(expandableSidebarController.toString());
-
       expandableSidebarController
           ._setOpenedBy(sidebarAnimationController.value);
     });
@@ -169,8 +167,6 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
     super.dispose();
   }
 
-  double swipedOffset = 0.0;
-
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -182,39 +178,54 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
       },
       onHorizontalDragUpdate: (details) {
         if (openBySwipe) {
-          const double sensitivity = 0.1;
+          const double sensitivity = 0.5;
           final dx = details.delta.dx;
 
-          if (dx < -sensitivity || dx > sensitivity) {
-            swipedOffset += dx;
-            final double mSidebarOpenedBy = sidebarOpenedBy(dx);
+          if (dx < 0) {
+            if (!expandableSidebarController.rightSwipeAllowed) return;
+          }
+          if (dx > 0) {
+            if (!expandableSidebarController.leftSwipeAllowed) return;
+          }
 
-            sidebarAnimationController.value = mSidebarOpenedBy;
+          if (dx < -sensitivity || dx > sensitivity) {
+            // if (swipedOffset < 0.5 && swipedOffset > -0.5) return;
+            sidebarAnimationController.value += dx / sidebarWidth;
           }
         }
       },
       onHorizontalDragEnd: (_) {
         if (openBySwipe) {
           expandableSidebarController._setIsDoingManualSwipe(false);
-          final mSidebarOpenedBy = sidebarOpenedBy(swipedOffset);
+          debugPrint(
+              '------------------------------------------------------------');
+          debugPrint('Swipe End');
+          debugPrint(
+              '------------------------------------------------------------');
 
           // Swipe to right
-          if (swipedOffset > 0) {
-            if (mSidebarOpenedBy >= stateChangeTrigger) {
+          if (expandableSidebarController.isOpening) {
+            if (expandableSidebarController.openedBy >= stateChangeTrigger) {
+              expandableSidebarController._setIsAutomaticallyOpening(true);
               expandableSidebarController.openSidebar();
             } else {
+              expandableSidebarController._setIsAutomaticallyClosing(true);
+
               expandableSidebarController.closeSidebar();
             }
             // Swipe to left
-          } else if (swipedOffset < 0) {
-            if (mSidebarOpenedBy >= 1 - stateChangeTrigger) {
+          } else if (expandableSidebarController.isClosing) {
+            if (expandableSidebarController.openedBy >=
+                1 - stateChangeTrigger) {
+              expandableSidebarController._setIsAutomaticallyOpening(true);
+
               expandableSidebarController.openSidebar();
             } else {
+              expandableSidebarController._setIsAutomaticallyClosing(true);
+
               expandableSidebarController.closeSidebar();
             }
           }
-
-          swipedOffset = 0.0;
         }
       },
       child: Stack(
@@ -278,22 +289,27 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
     );
   }
 
-  double sidebarOpenedBy(double dx) {
+  /*
+  double sidebarOpenedBy() {
+    debugPrint('swipedOffset: $swipedOffset');
     final sidebarOpenedProgress = swipedOffset / sidebarWidth;
+    debugPrint(
+        'sidebarOpenedProgress: ${sidebarOpenedProgress.toStringAsFixed(2)}');
     if (sidebarOpenedProgress >= 1.0) return 1.0;
     if (sidebarOpenedProgress <= -1.0) return 0.0;
-    if (dx > 0) {
+    if (sidebarOpenedProgress > 0) {
       // expandableSidebarController.openSidebar();
       return sidebarOpenedProgress;
     }
     // Left swipe
-    else if (dx < 0) {
+    else if (sidebarOpenedProgress < 0) {
       // expandableSidebarController.closeSidebar();
       return 1 - (sidebarOpenedProgress * -1);
     } else {
       return 0.0;
     }
   }
+  */
 }
 
 class ExpandableSidebarController extends ChangeNotifier {
@@ -343,8 +359,10 @@ class ExpandableSidebarController extends ChangeNotifier {
     }
     if (openedBy == 0.0 && (isClosing)) {
       _sidebarState = ExpandableSidebarState.closed;
+      _isAutomaticallyClosing = false;
     } else if (openedBy == 1.0 && (isOpening)) {
       _sidebarState = ExpandableSidebarState.open;
+      _isAutomaticallyOpening = false;
     }
     _openedBy = openedBy;
     notifyListeners();
@@ -359,9 +377,38 @@ class ExpandableSidebarController extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _isAutomaticallyClosing = false;
+  bool _isAutomaticallyOpening = false;
+
+  bool get isAutomaticallyClosing => _isAutomaticallyClosing;
+  bool get isAutomaticallyOpening => _isAutomaticallyOpening;
+
+  void _setIsAutomaticallyClosing(bool value) {
+    _isAutomaticallyClosing = value;
+    notifyListeners();
+  }
+
+  void _setIsAutomaticallyOpening(bool value) {
+    _isAutomaticallyOpening = value;
+    notifyListeners();
+  }
+
+  bool get rightSwipeAllowed {
+    if (isClosed) return false;
+    if (isAutomaticallyClosing && isClosing) return false;
+    return true;
+  }
+
+  bool get leftSwipeAllowed {
+    if (isOpen) return false;
+    if (isAutomaticallyOpening && isOpening) return false;
+    return true;
+  }
+
   @override
-  String toString() =>
-      'ExpandableSidebarController(_sidebarState: $_sidebarState, _openedBy: $_openedBy, _isDoingManualSwipe: $_isDoingManualSwipe)';
+  String toString() {
+    return 'ExpandableSidebarController(_sidebarState: $_sidebarState, _openedBy: $_openedBy, _isDoingManualSwipe: $_isDoingManualSwipe, _isAutomaticallyClosing: $_isAutomaticallyClosing, _isAutomaticallyOpening: $_isAutomaticallyOpening)';
+  }
 }
 
 enum ExpandableSidebarState {
