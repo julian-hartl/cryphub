@@ -57,6 +57,8 @@ class Cryphub extends StatelessWidget {
               id: 'light', data: light(context), description: 'Light theme'),
         ],
         defaultThemeId: 'light',
+        loadThemeOnInit: true,
+        saveThemesOnChange: false,
       ),
     );
   }

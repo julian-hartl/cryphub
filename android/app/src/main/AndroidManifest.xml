@@ -5,7 +5,7 @@
 
    <application
         android:label="cryphub"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/cryphub_icon">
 
         <activity
             android:name=".MainActivity"

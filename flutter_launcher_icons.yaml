@@ -1,0 +1,4 @@
+flutter_icons:
+  android: "cryphub_icon"
+  ios: "cryphub_icon"
+  image_path: "res/icon.png"
