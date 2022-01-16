@@ -159,7 +159,7 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
         if (widget.openBySwipe) {
           const double sensitivity = 0.5;
           final dx = details.delta.dx;
-
+          // todo: remove swiping checks
           if (dx < 0) {
             if (!expandableSidebarController.rightSwipeAllowed) return;
           }
