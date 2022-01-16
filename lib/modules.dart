@@ -1,3 +1,4 @@
+import 'package:cryphub/data/crypto_currency/crypto_currency_cache.dart';
 import 'package:dio/dio.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:injectable/injectable.dart';

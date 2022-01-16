@@ -83,8 +83,6 @@ class Cache<T, KeyType> {
     }
     _cacheBox = await Hive.openBox(cacheDirectory);
 
-    debugPrint(_cacheBox.values.toString());
-
     _cached.addAll(_cacheBox.values.map((json) =>
         CachedObject.fromJson(json.cast<String, dynamic>(), jsonMapper)));
     _initialized = true;

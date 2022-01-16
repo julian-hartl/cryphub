@@ -13,12 +13,13 @@ class FavoriteCurrenciesRepository implements IFavoriteCurrenicesRepository {
   FavoriteCurrenciesRepository(this.storage, this.logger);
 
   List<String>? _favoritesSymbols;
-  List<CryptoCurrency>? _favorites;
 
   /// returns all favorite currencies as their symbols
   @override
   Future<List<String>> getFavorites() async {
     await _initFavoritesSymbols();
+    logger.info(_favoritesSymbols);
+
     return _favoritesSymbols!;
   }
 
@@ -40,6 +41,7 @@ class FavoriteCurrenciesRepository implements IFavoriteCurrenicesRepository {
     try {
       await storage.initStorage;
       await _initFavoritesSymbols();
+
       if (_favoritesSymbols!.contains(symbol)) {
         throw MarkedCurrencyAsFavoriteTwiceException();
       }

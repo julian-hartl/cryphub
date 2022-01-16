@@ -7,7 +7,6 @@ import 'configure_dependencies.config.dart';
 final app = GetIt.instance;
 
 @InjectableInit()
-void configureDependencies() {
-  app.registerLazySingleton<CryptoCurrencyCache>(() => CryptoCurrencyCache());
-  $initGetIt(app);
+Future<void> configureDependencies() async {
+  await $initGetIt(app);
 }

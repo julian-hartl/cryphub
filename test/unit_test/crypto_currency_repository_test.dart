@@ -1,7 +1,9 @@
 import 'package:cryphub/config.dart';
+import 'package:cryphub/configure_dependencies.dart';
 import 'package:cryphub/data/crypto_currency/crypto_currency_cache.dart';
 import 'package:cryphub/data/crypto_currency/crypto_currency_repository.dart';
 import 'package:cryphub/data/utils/converters.dart';
+import 'package:cryphub/domain/application_directories.dart';
 import 'package:cryphub/domain/core/api_exception.dart';
 import 'package:cryphub/domain/core/cache/cache.dart';
 import 'package:cryphub/domain/core/logger/logger.dart';
@@ -30,6 +32,7 @@ void main() {
     late CryptoCurrencyCache cryptoCurrencyCache;
     setUpAll(() async {
       await Cache.init();
+      await configureDependencies();
     });
     setUp(() {
       dio = Dio();
@@ -38,7 +41,12 @@ void main() {
       cryptoCurrencyCache = CryptoCurrencyCache(
         cacheDirectory: 'test_crypto_currencies',
       );
-      sut = CryptoCurrencyRepository(dio, cryptoCurrencyCache, Logger());
+      sut = CryptoCurrencyRepository(
+        dio,
+        cryptoCurrencyCache,
+        Logger(),
+        app.get<ApplicationDirectories>(),
+      );
     });
     tearDown(() async {
       await cryptoCurrencyCache.eraseAll();

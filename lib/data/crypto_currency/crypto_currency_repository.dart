@@ -1,3 +1,4 @@
+import 'package:cryphub/domain/application_directories.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
@@ -14,14 +15,23 @@ import 'crypto_currency_cache.dart';
 @LazySingleton(as: ICryptoCurrencyRepository)
 class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
   final Dio dio;
-  final CryptoCurrencyCache cryptoCurrencyCache;
+  late final CryptoCurrencyCache cryptoCurrencyCache;
   final Logger logger;
+  final ApplicationDirectories applicationDirectories;
 
-  final _options = CacheOptions(
-    store: HiveCacheStore('crypto_currencies_request_store'),
+  late final _options = CacheOptions(
+    store: HiveCacheStore(
+      applicationDirectories.docDir,
+      hiveBoxName: 'crypto_currencies_request_storage',
+    ),
     maxStale: const Duration(minutes: 15),
   );
-  CryptoCurrencyRepository(this.dio, this.cryptoCurrencyCache, this.logger) {
+  CryptoCurrencyRepository(
+    this.dio,
+    this.cryptoCurrencyCache,
+    this.logger,
+    this.applicationDirectories,
+  ) {
     dio.interceptors.add(DioCacheInterceptor(options: _options));
   }
 
@@ -42,7 +52,7 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
       final latest = data
           .map((json) => cryptoCurrencyFromApiListingsLatest(json))
           .toList();
-      await cryptoCurrencyCache.cacheAll(latest);
+      await cryptoCurrencyCache.cacheAndReplaceAll(latest);
       return latest;
     } on DioError catch (e) {
       final String? errorMessage = errorMessageFromApiError(e);
@@ -77,14 +87,18 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
     final cachedCryptoCurrencies = await cryptoCurrencyCache
         .getInTimespan(DateTime.now().subtract(const Duration(minutes: 10)));
     final modifiableIds = List<int>.from(ids, growable: true);
+    final cachedCryptoCurrenciesWithIds = [];
     for (var element in cachedCryptoCurrencies) {
       modifiableIds.remove(element.id);
+      if (ids.contains(element.id)) {
+        cachedCryptoCurrenciesWithIds.add(element);
+      }
     }
     ids = modifiableIds;
 
     final cryptoCurrenciesFromApi = await getCryptoCurrenciesBy(ids, "id");
-    cryptoCurrencyCache.cacheAll(cryptoCurrenciesFromApi);
-    return [...cachedCryptoCurrencies, ...cryptoCurrenciesFromApi];
+    cryptoCurrencyCache.cacheAndReplaceAll(cryptoCurrenciesFromApi);
+    return [...cachedCryptoCurrenciesWithIds, ...cryptoCurrenciesFromApi];
   }
 
   @override
@@ -93,15 +107,19 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
     final cachedCryptoCurrencies = await cryptoCurrencyCache
         .getInTimespan(DateTime.now().subtract(const Duration(minutes: 10)));
     final modifiableSymbols = List<String>.from(symbols, growable: true);
+    final cachedCryptoCurrenciesWithSymbols = [];
 
     for (var element in cachedCryptoCurrencies) {
       modifiableSymbols.remove(element.symbol);
+      if (symbols.contains(element.symbol)) {
+        cachedCryptoCurrenciesWithSymbols.add(element);
+      }
     }
     symbols = modifiableSymbols;
     final cryptoCurrenciesFromApi =
         await getCryptoCurrenciesBy(symbols, 'symbol');
-    cryptoCurrencyCache.cacheAll(cryptoCurrenciesFromApi);
-    return [...cachedCryptoCurrencies, ...cryptoCurrenciesFromApi];
+    cryptoCurrencyCache.cacheAndReplaceAll(cryptoCurrenciesFromApi);
+    return [...cachedCryptoCurrenciesWithSymbols, ...cryptoCurrenciesFromApi];
   }
 
   /// [what] indicates which query paramter should be used to query crypto currencies

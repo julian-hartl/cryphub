@@ -1,7 +1,12 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:cryphub/application/blocs/settings/settings_bloc.dart';
+import 'package:cryphub/application/blocs/settings_notifier/settings_notifier_bloc.dart';
+import 'package:cryphub/application/widgets/alerts.dart';
+import 'package:cryphub/application/widgets/retry.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -9,6 +14,7 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.read<SettingsBloc>().add(const SettingsEvent.loadSettings());
     return const Scaffold(
       body: SettingsScreenContent(),
     );
@@ -22,71 +28,111 @@ class SettingsScreenContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GestureDetector(
-              onTap: () {
-                AutoRouter.of(context).pop();
-              },
-              child: const Icon(
-                Icons.arrow_back_ios,
-                size: 30,
-              ),
+    return BlocListener<SettingsNotifierBloc, SettingsNotifierState>(
+      listener: (context, state) {
+        state.maybeWhen(
+          orElse: () {},
+          toggledDarkMode: (value) {
+            AdaptiveTheme.of(context).setThemeMode(
+                value ? AdaptiveThemeMode.dark : AdaptiveThemeMode.light);
+          },
+          errorTogglingDarkMode: () {
+            ErrorAlert.show(context, 'Could not toggle dark mode...');
+          },
+        );
+      },
+      child: BlocBuilder<SettingsBloc, SettingsState>(
+        builder: (context, state) {
+          return state.when(
+            loadingSettings: () => const Center(
+              child: CircularProgressIndicator(),
             ),
-            const Gap(30),
-            Text(
-              'Settings',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 45,
-              ),
-            ),
-            const Gap(50),
-            Text(
-              'Preferences'.toUpperCase(),
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onBackground.withOpacity(
-                      0.6,
-                    ),
-                letterSpacing: 1.5,
-                fontSize: 17,
-              ),
-            ),
-            const Gap(20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      child: Icon(Icons.brightness_2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Theme.of(context).colorScheme.surface,
+            loadedSettings: (settings) {
+              return SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          AutoRouter.of(context).pop();
+                        },
+                        child: const Icon(
+                          Icons.arrow_back_ios,
+                          size: 30,
+                        ),
                       ),
-                      padding: const EdgeInsets.all(10.0),
-                    ),
-                    const Gap(10),
-                    Text('Dark Mode'),
-                  ],
+                      const Gap(30),
+                      Text(
+                        'Settings',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 45,
+                        ),
+                      ),
+                      const Gap(50),
+                      Text(
+                        'Preferences'.toUpperCase(),
+                        style: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onBackground
+                              .withOpacity(
+                                0.6,
+                              ),
+                          letterSpacing: 1.5,
+                          fontSize: 17,
+                        ),
+                      ),
+                      const Gap(20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                child: Icon(Icons.brightness_2),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Theme.of(context).colorScheme.surface,
+                                ),
+                                padding: const EdgeInsets.all(10.0),
+                              ),
+                              const Gap(10),
+                              Text('Dark Mode'),
+                            ],
+                          ),
+                          OnOffSwitch(
+                              initial: settings.darkMode,
+                              onChanged: (value) {
+                                if (value) {
+                                  AdaptiveTheme.of(context).setDark();
+                                } else {
+                                  AdaptiveTheme.of(context).setLight();
+                                }
+                              })
+                        ],
+                      )
+                    ],
+                  ),
                 ),
-                OnOffSwitch(
-                    initial: false,
-                    onChanged: (value) {
-                      if (value) {
-                        AdaptiveTheme.of(context).setDark();
-                      } else {
-                        AdaptiveTheme.of(context).setLight();
-                      }
-                    })
-              ],
-            )
-          ],
-        ),
+              );
+            },
+            error: (message) {
+              return Center(
+                child: Retry(
+                  message,
+                  onRetry: () {
+                    context
+                        .read<SettingsBloc>()
+                        .add(const SettingsEvent.loadSettings());
+                  },
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }

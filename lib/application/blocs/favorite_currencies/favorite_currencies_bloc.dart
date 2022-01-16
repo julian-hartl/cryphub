@@ -30,14 +30,13 @@ class FavoriteCurrenciesBloc
       try {
         final favoritesSymbols =
             await favoriteCurrenciesRepository.getFavorites();
-        List<CryptoCurrency>? favorites;
+        List<CryptoCurrency> favorites = [];
         if (favoritesSymbols.isNotEmpty) {
           favorites = await cryptoCurrencyRepository
               .getCryptoCurrencyBySymbols(favoritesSymbols);
         }
 
-        emit(FavoriteCurrenciesState.updatedFavorites(
-            KtList.from(favorites ?? [])));
+        emit(FavoriteCurrenciesState.updatedFavorites(KtList.from(favorites)));
       } catch (e) {
         logger.warning(e);
 

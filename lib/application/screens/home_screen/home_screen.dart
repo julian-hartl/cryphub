@@ -1,4 +1,6 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cryphub/application/blocs/settings/settings_bloc.dart';
+import 'package:cryphub/application/blocs/settings_notifier/settings_notifier_bloc.dart';
 import 'package:cryphub/application/screens/settings_screen/settings_screen.dart';
 import 'package:cryphub/application/widgets/expandable_sidebar.dart';
 import 'package:gap/gap.dart';
@@ -28,7 +30,13 @@ class HomeScreen extends StatelessWidget {
         BlocProvider(create: (context) => app.get<LatestCurrenciesBloc>()),
         BlocProvider(
           create: (context) => app.get<FavoriteCurrenciesNotifierBloc>(),
-        )
+        ),
+        BlocProvider(
+          create: (context) => app.get<SettingsBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => app.get<SettingsNotifierBloc>(),
+        ),
       ],
       child: const HomeScreenContent(),
     );

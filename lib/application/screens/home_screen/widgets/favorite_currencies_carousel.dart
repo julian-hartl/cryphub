@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cryphub/configure_dependencies.dart';
 import 'package:cryphub/data/utils/dominant_color_finder.dart';
@@ -139,14 +140,22 @@ class FavoriteCurrencyCard extends StatefulWidget {
 class _FavoriteCurrencyCardState extends State<FavoriteCurrencyCard> {
   @override
   void initState() {
-    app
-        .get<DominantColorFinder>()
-        .find(NetworkImage(widget.favorite.iconUrl))
-        .then((value) {
-      setState(() {
-        computedDominantColor = Future.value(value);
+    try {
+      app
+          .get<DominantColorFinder>()
+          .find(CachedNetworkImageProvider(widget.favorite.iconUrl))
+          .then((value) {
+        setState(() {
+          computedDominantColor = Future.value(value);
+        });
+      }).catchError((_) {
+        setState(() {
+          computedDominantColor =
+              Future.value(Theme.of(context).colorScheme.primary);
+        });
       });
-    });
+    } catch (_) {}
+
     super.initState();
   }
 
