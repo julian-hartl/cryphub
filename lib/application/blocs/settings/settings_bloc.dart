@@ -24,12 +24,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<_ToggleDarkMode>((event, emit) async {
       try {
         final currentSettings = await settingsRepository.readSettings();
-
-        await settingsRepository.updateSettings(
-          currentSettings.copyWith(darkMode: event.value),
-        );
+        final updatedSettings = currentSettings.copyWith(darkMode: event.value);
+        await settingsRepository.updateSettings(updatedSettings);
         settingsNotifierBloc.add(
             SettingsNotifierEvent.successfullyToggledDarkMode(event.value));
+        emit(SettingsState.loadedSettings(updatedSettings));
       } catch (_) {
         settingsNotifierBloc.add(
             const SettingsNotifierEvent.errorOccurredWhileTogglingDarkMode());
@@ -40,7 +39,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       emit(const SettingsState.loadingSettings());
       try {
         final settings = await settingsRepository.readSettings();
-        logger.info(settings);
         emit(SettingsState.loadedSettings(settings));
       } catch (_) {
         emit(const SettingsState.error('Could not load settings...'));

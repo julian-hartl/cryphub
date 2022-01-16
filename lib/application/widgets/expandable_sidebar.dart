@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 class ExpandableSidebar extends StatefulWidget {
@@ -7,17 +5,17 @@ class ExpandableSidebar extends StatefulWidget {
     Key? key,
     required this.child,
     this.controller,
-    this.duration,
+    this.duration = const Duration(milliseconds: 200),
     this.sidebar,
-    this.sidebarWidth,
-    this.angle,
-    this.yOffset,
-    this.openBySwipe,
-    this.stateChangeTrigger,
+    this.sidebarWidth = 350,
+    this.angle = 0.0,
+    this.yOffset = 0.0,
+    this.openBySwipe = true,
+    this.stateChangeTrigger = 0.1,
     this.sidebarColor,
-    this.curve,
+    this.curve = Curves.linear,
     this.backgroundColor,
-    this.scale,
+    this.scale = 0.8,
   }) : super(key: key);
 
   /// The [Widget] that is displayed next to the sidebar.
@@ -27,7 +25,7 @@ class ExpandableSidebar extends StatefulWidget {
   final ExpandableSidebarController? controller;
 
   /// Duration of how long it takes to fully open up the sidebar.
-  final Duration? duration;
+  final Duration duration;
 
   /// The actual content of the sidebar.
   final Widget? sidebar;
@@ -35,33 +33,33 @@ class ExpandableSidebar extends StatefulWidget {
   /// The width of the sidebar.
   ///
   /// Defaults to `350`
-  final double? sidebarWidth;
+  final double sidebarWidth;
 
   /// Rotates the [child] when the sidebar is opened.
-  final double? angle;
+  final double angle;
 
   /// Offsets the [child] on the y-axis.
-  final double? yOffset;
+  final double yOffset;
 
   /// Determines wether the sidebar can be opened by swipe gestures or not.
   ///
   /// Defaults to `true`
-  final bool? openBySwipe;
+  final bool openBySwipe;
 
   /// Determines at which percentage of the [sidebarWidth] the sidebar will snap when it is dragged.
-  final double? stateChangeTrigger;
+  final double stateChangeTrigger;
 
   /// The sidebar's background color.
   final Color? sidebarColor;
 
   /// The curve with which the sidebar is animated.
-  final Curve? curve;
+  final Curve curve;
 
   /// The child's background color.
   final Color? backgroundColor;
 
   /// The scale at which the child is shown when the sidebar is opened.
-  final double? scale;
+  final double scale;
 
   @override
   _ExpandableSidebarState createState() => _ExpandableSidebarState();
@@ -77,33 +75,14 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
 
   late final AnimationController sidebarAnimationController;
   late final ExpandableSidebarController expandableSidebarController;
-  late final Duration animationDuration;
-  late final double sidebarWidth;
-  late final double yOffset;
-  late final double angle;
-  late final bool openBySwipe;
-  late final double stateChangeTrigger;
-  late final Color? sidebarColor;
-  late final Curve curve;
-  late final Color? backgroundColor;
-  late final double scale;
 
   @override
   void initState() {
-    scale = widget.scale ?? 0.8;
-    backgroundColor = widget.backgroundColor;
-    curve = widget.curve ?? Curves.linear;
-    sidebarColor = widget.sidebarColor;
-    stateChangeTrigger = widget.stateChangeTrigger ?? 0.10;
-    openBySwipe = widget.openBySwipe ?? true;
-    angle = widget.angle ?? 0.0;
-    sidebarWidth = widget.sidebarWidth ?? 350;
-    yOffset = widget.yOffset ?? 0.0;
-    animationDuration = widget.duration ?? const Duration(milliseconds: 200);
     sidebarAnimationController = AnimationController(
       vsync: this,
-      duration: animationDuration,
+      duration: widget.duration,
     );
+    final curve = widget.curve;
     sidebarSlideUpAnimation = Tween<Offset>(
       begin: const Offset(0, 400),
       end: const Offset(0, 0),
@@ -127,12 +106,12 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
 
     sidebarTranslateAnimation = Tween<Offset>(
       begin: const Offset(0, 0),
-      end: Offset(sidebarWidth, yOffset),
+      end: Offset(widget.sidebarWidth, widget.yOffset),
     ).animate(CurvedAnimation(
       parent: sidebarAnimationController,
       curve: curve,
     ));
-    childRotateAnimation = Tween<double>(begin: 0.0, end: angle).animate(
+    childRotateAnimation = Tween<double>(begin: 0.0, end: widget.angle).animate(
         CurvedAnimation(
             parent: sidebarAnimationController,
             curve: Interval(0.3, 1, curve: curve)));
@@ -172,12 +151,12 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
     final height = MediaQuery.of(context).size.height;
     return GestureDetector(
       onHorizontalDragStart: (_) {
-        if (openBySwipe) {
+        if (widget.openBySwipe) {
           expandableSidebarController._setIsDoingManualSwipe(true);
         }
       },
       onHorizontalDragUpdate: (details) {
-        if (openBySwipe) {
+        if (widget.openBySwipe) {
           const double sensitivity = 0.5;
           final dx = details.delta.dx;
 
@@ -190,17 +169,18 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
 
           if (dx < -sensitivity || dx > sensitivity) {
             // if (swipedOffset < 0.5 && swipedOffset > -0.5) return;
-            sidebarAnimationController.value += dx / sidebarWidth;
+            sidebarAnimationController.value += dx / widget.sidebarWidth;
           }
         }
       },
       onHorizontalDragEnd: (_) {
-        if (openBySwipe) {
+        if (widget.openBySwipe) {
           expandableSidebarController._setIsDoingManualSwipe(false);
 
           // Swipe to right
           if (expandableSidebarController.isOpening) {
-            if (expandableSidebarController.openedBy >= stateChangeTrigger) {
+            if (expandableSidebarController.openedBy >=
+                widget.stateChangeTrigger) {
               expandableSidebarController._setIsAutomaticallyOpening(true);
               expandableSidebarController.openSidebar();
             } else {
@@ -211,7 +191,7 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
             // Swipe to left
           } else if (expandableSidebarController.isClosing) {
             if (expandableSidebarController.openedBy >=
-                1 - stateChangeTrigger) {
+                1 - widget.stateChangeTrigger) {
               expandableSidebarController._setIsAutomaticallyOpening(true);
 
               expandableSidebarController.openSidebar();
@@ -228,7 +208,7 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
           Container(
               width: MediaQuery.of(context).size.width,
               height: height,
-              color: sidebarColor ?? Theme.of(context).backgroundColor),
+              color: widget.sidebarColor ?? Theme.of(context).backgroundColor),
           AnimatedBuilder(
             builder: (BuildContext context, Widget? child) {
               return Transform.translate(
@@ -239,11 +219,11 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
             },
             animation: sidebarAnimationController,
             child: Transform.translate(
-              offset: Offset(-sidebarWidth, 0.0),
+              offset: Offset(-widget.sidebarWidth, 0.0),
               child: SizedBox(
                 child: widget.sidebar,
                 height: height,
-                width: sidebarWidth,
+                width: widget.sidebarWidth,
               ),
             ),
           ),
@@ -254,7 +234,8 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
                 expandableSidebarController.closeSidebar();
               },
               child: Container(
-                color: backgroundColor ?? Theme.of(context).backgroundColor,
+                color:
+                    widget.backgroundColor ?? Theme.of(context).backgroundColor,
                 child: widget.child,
               ),
             ),
@@ -267,7 +248,7 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
                   offset.dy +
                       sidebarAnimationController.value *
                           height *
-                          ((1 - scale) / 2),
+                          ((1 - widget.scale) / 2),
                   0,
                 )
                   ..rotateZ(angle)

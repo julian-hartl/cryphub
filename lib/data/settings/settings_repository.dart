@@ -40,7 +40,6 @@ class SettingsRepository implements ISettingsRepository {
   Future<void> updateSettings(Settings settings) async {
     _settings = settings;
     final json = jsonEncode(settings.toJson());
-    logger.info(json);
     await sharedPreferences.setString('settings', json);
   }
 }

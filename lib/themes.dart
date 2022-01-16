@@ -6,7 +6,7 @@ const _darkOnBg = Color(0xFFFEFEFE);
 ThemeData dark(BuildContext context) => ThemeData(
       colorScheme: const ColorScheme.dark(
         background: _darkBg,
-        surface: Color(0xFF979A9B),
+        surface: Color(0xFF424342),
         primary: Color(0xFF31E384),
         onBackground: _darkOnBg,
       ),
@@ -43,3 +43,8 @@ ThemeData light(BuildContext context) => ThemeData(
 const positiveGrowthColor = Color(0xFF31E384);
 const noGrowthColor = Color(0xFF979A9B);
 const negativeGrowthColor = Color(0xFFFA8C96);
+
+abstract class Themes {
+  static const dark = 'dark';
+  static const light = 'light';
+}

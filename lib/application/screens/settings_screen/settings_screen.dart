@@ -1,13 +1,14 @@
-import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:cryphub/application/blocs/settings/settings_bloc.dart';
 import 'package:cryphub/application/blocs/settings_notifier/settings_notifier_bloc.dart';
 import 'package:cryphub/application/widgets/alerts.dart';
 import 'package:cryphub/application/widgets/retry.dart';
+import 'package:cryphub/themes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:theme_provider/theme_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -34,8 +35,8 @@ class SettingsScreenContent extends StatelessWidget {
         state.maybeWhen(
           orElse: () {},
           toggledDarkMode: (value) {
-            AdaptiveTheme.of(context).setThemeMode(
-                value ? AdaptiveThemeMode.dark : AdaptiveThemeMode.light);
+            ThemeProvider.controllerOf(context)
+                .setTheme(value ? Themes.dark : Themes.light);
           },
           errorTogglingDarkMode: () {
             ErrorAlert.show(context, 'Could not toggle dark mode...');
@@ -170,7 +171,7 @@ class _OnOffSwitchState extends State<OnOffSwitch> {
           value: !off,
           onChanged: (value) {
             setState(() {
-              off = !value;
+              off = !off;
             });
             if (widget.onChanged != null) {
               widget.onChanged!(value);
