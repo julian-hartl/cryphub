@@ -22,24 +22,7 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-            create: (context) => app.get<FavoriteCurrenciesBloc>()
-              ..add(const FavoriteCurrenciesEvent.loadFavorites())),
-        BlocProvider(create: (context) => app.get<LatestCurrenciesBloc>()),
-        BlocProvider(
-          create: (context) => app.get<FavoriteCurrenciesNotifierBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => app.get<SettingsBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => app.get<SettingsNotifierBloc>(),
-        ),
-      ],
-      child: const HomeScreenContent(),
-    );
+    return const HomeScreenContent();
   }
 }
 
@@ -121,7 +104,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                     // Navigator.of(context).push(MaterialPageRoute(
                     //   builder: (context) => SettingsScreen(),
                     // ));
-                    context.router.push(const SettingsScreenRoute());
+                    AutoRouter.of(context).push(const SettingsScreenRoute());
                   },
                   child: Row(
                     children: const [

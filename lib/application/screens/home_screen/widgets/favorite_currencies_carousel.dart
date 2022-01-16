@@ -111,7 +111,7 @@ class _FavoriteCurrenciesSlidePageState
           mainAxisSpacing: 15,
         ),
         scrollDirection: Axis.horizontal,
-        shrinkWrap: widget.itemCount > 1,
+        shrinkWrap: widget.itemCount > 2,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: widget.itemCount,
         itemBuilder: (context, gridIndex) => FavoriteCurrencyCard(

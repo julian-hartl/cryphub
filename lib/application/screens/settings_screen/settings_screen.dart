@@ -15,6 +15,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     context.read<SettingsBloc>().add(const SettingsEvent.loadSettings());
+
     return const Scaffold(
       body: SettingsScreenContent(),
     );
@@ -106,11 +107,9 @@ class SettingsScreenContent extends StatelessWidget {
                           OnOffSwitch(
                               initial: settings.darkMode,
                               onChanged: (value) {
-                                if (value) {
-                                  AdaptiveTheme.of(context).setDark();
-                                } else {
-                                  AdaptiveTheme.of(context).setLight();
-                                }
+                                context
+                                    .read<SettingsBloc>()
+                                    .add(SettingsEvent.toggleDarkMode(value));
                               })
                         ],
                       )

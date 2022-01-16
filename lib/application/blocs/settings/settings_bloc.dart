@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:cryphub/application/blocs/settings_notifier/settings_notifier_bloc.dart';
+import 'package:cryphub/domain/core/logger/logger.dart';
 import 'package:cryphub/domain/settings/settings.dart';
 import 'package:cryphub/domain/settings/settings_repository.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -13,10 +14,12 @@ part 'settings_bloc.freezed.dart';
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final ISettingsRepository settingsRepository;
   final SettingsNotifierBloc settingsNotifierBloc;
+  final Logger logger;
 
   SettingsBloc(
     this.settingsRepository,
     this.settingsNotifierBloc,
+    this.logger,
   ) : super(const SettingsState.loadingSettings()) {
     on<_ToggleDarkMode>((event, emit) async {
       try {
@@ -36,8 +39,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<_LoadSettings>((event, emit) async {
       emit(const SettingsState.loadingSettings());
       try {
-        emit(SettingsState.loadedSettings(
-            await settingsRepository.readSettings()));
+        final settings = await settingsRepository.readSettings();
+        logger.info(settings);
+        emit(SettingsState.loadedSettings(settings));
       } catch (_) {
         emit(const SettingsState.error('Could not load settings...'));
       }

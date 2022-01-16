@@ -12,6 +12,11 @@ ThemeData dark(BuildContext context) => ThemeData(
       ),
       fontFamily: GoogleFonts.aBeeZee().fontFamily,
       scaffoldBackgroundColor: _darkBg,
+      appBarTheme: AppBarTheme(
+          backgroundColor: _darkBg,
+          iconTheme: const IconThemeData(color: _darkOnBg),
+          titleTextStyle:
+              _lightTextTheme.bodyText2?.copyWith(color: _darkOnBg)),
       textTheme: GoogleFonts.robotoTextTheme().copyWith(
         bodyText2: TextStyle(color: _darkOnBg),
       ),

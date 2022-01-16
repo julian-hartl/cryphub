@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cryphub/domain/core/logger/logger.dart';
 import 'package:cryphub/domain/settings/settings.dart';
 import 'package:cryphub/domain/settings/settings_repository.dart';
 import 'package:injectable/injectable.dart';
@@ -8,8 +9,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 @LazySingleton(as: ISettingsRepository)
 class SettingsRepository implements ISettingsRepository {
   final SharedPreferences sharedPreferences;
+  final Logger logger;
 
-  SettingsRepository(this.sharedPreferences);
+  SettingsRepository(
+    this.sharedPreferences,
+    this.logger,
+  );
 
   Settings? _settings;
 
@@ -35,6 +40,7 @@ class SettingsRepository implements ISettingsRepository {
   Future<void> updateSettings(Settings settings) async {
     _settings = settings;
     final json = jsonEncode(settings.toJson());
+    logger.info(json);
     await sharedPreferences.setString('settings', json);
   }
 }
