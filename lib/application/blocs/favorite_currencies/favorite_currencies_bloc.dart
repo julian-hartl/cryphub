@@ -47,6 +47,7 @@ class FavoriteCurrenciesBloc
     on<_MarkAsFavorite>((event, emit) async {
       final currentFavorites = await _getCurrentFavorites();
       final toBeMarkedAsFavoriteSymbol = event.symbol;
+      logger.info('Marking $toBeMarkedAsFavoriteSymbol as favorite...');
 
       try {
         await favoriteCurrenciesRepository
@@ -54,8 +55,9 @@ class FavoriteCurrenciesBloc
         final toBeMarkedAsFavorite = (await cryptoCurrencyRepository
             .getCryptoCurrencyBySymbols([toBeMarkedAsFavoriteSymbol]))[0];
 
+        currentFavorites.add(toBeMarkedAsFavorite);
         emit(FavoriteCurrenciesState.updatedFavorites(
-            (currentFavorites..add(toBeMarkedAsFavorite)).toImmutableList()));
+            currentFavorites.toImmutableList()));
         favoriteCurrenciesNotifier.add(FavoriteCurrenciesNotifierEvent
             .markedCurrencyAsFavoriteSuccessfully(toBeMarkedAsFavoriteSymbol));
       } catch (e) {
@@ -91,8 +93,11 @@ class FavoriteCurrenciesBloc
   }
 
   Future<List<CryptoCurrency>> _getCurrentFavorites() async {
-    return await cryptoCurrencyRepository.getCryptoCurrencyBySymbols(
-      await favoriteCurrenciesRepository.getFavorites(),
+    return List.from(
+      await cryptoCurrencyRepository.getCryptoCurrencyBySymbols(
+        await favoriteCurrenciesRepository.getFavorites(),
+      ),
+      growable: true,
     );
   }
 }

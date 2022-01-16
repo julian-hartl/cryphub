@@ -197,11 +197,6 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
       onHorizontalDragEnd: (_) {
         if (openBySwipe) {
           expandableSidebarController._setIsDoingManualSwipe(false);
-          debugPrint(
-              '------------------------------------------------------------');
-          debugPrint('Swipe End');
-          debugPrint(
-              '------------------------------------------------------------');
 
           // Swipe to right
           if (expandableSidebarController.isOpening) {

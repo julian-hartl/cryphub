@@ -27,7 +27,8 @@ class FavoriteCurrenciesRepository implements IFavoriteCurrenicesRepository {
       await storage.initStorage;
       final favorites = storage.read<List>('favorites');
 
-      _favoritesSymbols ??= favorites?.cast<String>() ?? [];
+      _favoritesSymbols ??=
+          List<String>.from(favorites?.cast<String>() ?? [], growable: true);
     } catch (e) {
       logger.error(e.toString());
       rethrow;

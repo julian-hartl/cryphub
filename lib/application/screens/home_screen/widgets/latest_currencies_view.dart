@@ -157,7 +157,6 @@ class CurrencyCard extends StatelessWidget {
             FavoriteButton(
               isFavorite: isFavorite,
               onTap: (isFavorite) {
-                app.get<Logger>().info(isFavorite);
                 if (!isFavorite) {
                   context.read<FavoriteCurrenciesBloc>().add(
                       FavoriteCurrenciesEvent.removeFromFavorites(

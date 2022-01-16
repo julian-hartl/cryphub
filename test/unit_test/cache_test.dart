@@ -242,6 +242,68 @@ void main() {
     final result = await sut.getInTimespan(from);
     expect(result, equals([]));
   });
+
+  test('cacheAndReplace should replace an existing value with the same key',
+      () async {
+    const complexObjects = [
+      ComplexObject(name: 'Julian', age: 10, id: 2),
+      ComplexObject(name: 'Julian', age: 12, id: 2),
+    ];
+    await sut.cache(complexObjects[0]);
+    await sut.cacheAndReplace(complexObjects[1]);
+
+    final result = await sut.getByKey(2);
+    expect(result, equals(complexObjects[1]));
+  });
+
+  test(
+      'cacheAndReplace should not replace an existing value with the a differnt key',
+      () async {
+    const complexObjects = [
+      ComplexObject(name: 'Julian', age: 10, id: 3),
+      ComplexObject(name: 'Julian', age: 12, id: 2),
+    ];
+    await sut.cache(complexObjects[0]);
+    await sut.cacheAndReplace(complexObjects[1]);
+
+    final id2 = await sut.getByKey(2);
+    final id3 = await sut.getByKey(3);
+    expect(id2, equals(complexObjects[1]));
+    expect(id3, equals(complexObjects[0]));
+  });
+
+  test('cacheAndReplaceAll should replace existing values with the same key',
+      () async {
+    const complexObjects = [
+      ComplexObject(name: 'Julian', age: 10, id: 2),
+      ComplexObject(name: 'Julian', age: 12, id: 3),
+    ];
+    const complexObjectsReplacements = [
+      ComplexObject(name: 'Julian', age: 12, id: 2),
+      ComplexObject(name: 'Julian', age: 14, id: 3),
+    ];
+    await sut.cacheAll(complexObjects);
+    await sut.cacheAndReplaceAll(complexObjectsReplacements);
+
+    final result = await sut.getByKey(2);
+    expect(result, equals(complexObjectsReplacements[0]));
+  });
+
+  test(
+      'cacheAndReplace should not replace an existing value with the a differnt key',
+      () async {
+    const complexObjects = [
+      ComplexObject(name: 'Julian', age: 10, id: 3),
+      ComplexObject(name: 'Julian', age: 12, id: 2),
+    ];
+    await sut.cache(complexObjects[0]);
+    await sut.cacheAndReplace(complexObjects[1]);
+
+    final id2 = await sut.getByKey(2);
+    final id3 = await sut.getByKey(3);
+    expect(id2, equals(complexObjects[1]));
+    expect(id3, equals(complexObjects[0]));
+  });
 }
 
 class ComplexObject {

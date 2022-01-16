@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
+import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../config.dart';
@@ -17,8 +18,7 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
   final Logger logger;
 
   final _options = CacheOptions(
-    // HiveCacheStore('crypto_currencies_request_store')
-    store: MemCacheStore(),
+    store: HiveCacheStore('crypto_currencies_request_store'),
     maxStale: const Duration(minutes: 15),
   );
   CryptoCurrencyRepository(this.dio, this.cryptoCurrencyCache, this.logger) {
@@ -42,7 +42,7 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
       final latest = data
           .map((json) => cryptoCurrencyFromApiListingsLatest(json))
           .toList();
-      // await cryptoCurrencyCache.cacheAll(latest);
+      await cryptoCurrencyCache.cacheAll(latest);
       return latest;
     } on DioError catch (e) {
       final String? errorMessage = errorMessageFromApiError(e);
@@ -74,22 +74,28 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
 
   @override
   Future<List<CryptoCurrency>> getCryptoCurrenciesByIds(List<int> ids) async {
-    // for (var element in (await cryptoCurrencyCache
-    //     .getInTimespan(DateTime.now().subtract(const Duration(minutes: 10))))) {
-    //   ids.remove(element.id);
-    // }
-    return await getCryptoCurrenciesBy(ids, "id");
+    final cachedCryptoCurrencies = await cryptoCurrencyCache
+        .getInTimespan(DateTime.now().subtract(const Duration(minutes: 10)));
+    for (var element in cachedCryptoCurrencies) {
+      ids.remove(element.id);
+    }
+    final cryptoCurrenciesFromApi = await getCryptoCurrenciesBy(ids, "id");
+    cryptoCurrencyCache.cacheAll(cryptoCurrenciesFromApi);
+    return [...cachedCryptoCurrencies, ...cryptoCurrenciesFromApi];
   }
 
   @override
   Future<List<CryptoCurrency>> getCryptoCurrencyBySymbols(
       List<String> symbols) async {
-    // for (var element in (await cryptoCurrencyCache
-    //     .getInTimespan(DateTime.now().subtract(const Duration(minutes: 10))))) {
-    //   symbols.remove(element.symbol);
-    // }
-    final result = await getCryptoCurrenciesBy(symbols, 'symbol');
-    return result;
+    final cachedCryptoCurrencies = await cryptoCurrencyCache
+        .getInTimespan(DateTime.now().subtract(const Duration(minutes: 10)));
+    for (var element in cachedCryptoCurrencies) {
+      symbols.remove(element.symbol);
+    }
+    final cryptoCurrenciesFromApi =
+        await getCryptoCurrenciesBy(symbols, 'symbol');
+    cryptoCurrencyCache.cacheAll(cryptoCurrenciesFromApi);
+    return [...cachedCryptoCurrencies, ...cryptoCurrenciesFromApi];
   }
 
   /// [what] indicates which query paramter should be used to query crypto currencies

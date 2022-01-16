@@ -128,4 +128,8 @@ class Cache<T> {
   static Future<void> init() async {
     await Hive.initFlutter();
   }
+
+  Future<void> cacheAndReplace(T item) async {}
+
+  Future<void> cacheAndReplaceAll(List<T> items) async {}
 }
