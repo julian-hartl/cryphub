@@ -40,6 +40,9 @@ void main() {
       );
       sut = CryptoCurrencyRepository(dio, cryptoCurrencyCache, Logger());
     });
+    tearDown(() async {
+      await cryptoCurrencyCache.eraseAll();
+    });
     test('Get from currency url', () async {
       const path = '/api';
       const status = 200;

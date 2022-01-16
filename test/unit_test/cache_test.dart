@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cryphub/domain/core/cache/unsupported_key_type_exception.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -16,9 +17,20 @@ void main() {
   late Cache sut;
   const boxName = 'test';
 
-  Cache<T> createCache<T>(
-          {dynamic Function(T value)? getKey, JsonMapper<T>? jsonMapper}) =>
-      Cache<T>(boxName, getKey: getKey, jsonMapper: jsonMapper);
+  Cache<T, KeyType> createCache<T, KeyType>(
+          {KeyType Function(T value)? getKey, JsonMapper<T>? jsonMapper}) =>
+      Cache<T, KeyType>(boxName,
+          getKey: getKey ?? (value) => value as KeyType,
+          jsonMapper: jsonMapper);
+
+  Cache<ComplexObject, int> createComplexObjectCache() {
+    return createCache<ComplexObject, int>(
+        getKey: (value) => value.id,
+        jsonMapper: JsonMapper(
+          fromJson: (json) => ComplexObject.fromMap(json),
+          toJson: (value) => value.toMap(),
+        ));
+  }
 
   setUpAll(() async {
     await Cache.init();
@@ -26,7 +38,7 @@ void main() {
   });
 
   setUp(() {
-    sut = createCache();
+    sut = createCache<String, String>();
   });
 
   tearDown(() async {
@@ -44,7 +56,7 @@ void main() {
       () async {
     const item = 'jslfkjs';
     await sut.cache(item);
-    sut = createCache();
+    sut = createCache<String, String>();
 
     await sut.initialize();
     expect(sut.cached, contains(item));
@@ -84,7 +96,8 @@ void main() {
       () async {
     const items = ['item1', 'item2', 'item3'];
     await sut.cacheAll(items);
-    sut = createCache();
+    sut = createCache<String, String>();
+
     await sut.initialize();
     expect(sut.cached, containsAll(items));
   });
@@ -140,7 +153,7 @@ void main() {
       () async {
     const key = 'key';
     const item = 'kjkwlefkwjl';
-    sut = createCache(
+    sut = createCache<String, String>(
       getKey: (_) => key,
     );
     await sut.cache(item);
@@ -152,12 +165,7 @@ void main() {
       'when jsonMapper is provided it should use toJson to pass complex objects',
       () async {
     const complexObject = ComplexObject(name: 'Julian', age: 10, id: 2);
-    sut = createCache<ComplexObject>(
-        getKey: (value) => value.id,
-        jsonMapper: JsonMapper(
-          fromJson: (json) => ComplexObject.fromMap(json),
-          toJson: (value) => value.toMap(),
-        ));
+    sut = createComplexObjectCache();
     await sut.cache(complexObject);
 
     final result = await sut.getByKey(complexObject.id);
@@ -172,20 +180,11 @@ void main() {
       ComplexObject(name: 'Julian', age: 10, id: 2),
       ComplexObject(name: 'Julian', age: 10, id: 3),
     ];
-    sut = createCache<ComplexObject>(
-        getKey: (value) => value.id,
-        jsonMapper: JsonMapper(
-          fromJson: (json) => ComplexObject.fromMap(json),
-          toJson: (value) => value.toMap(),
-        ));
+    sut = createComplexObjectCache();
+
     await sut.cacheAll(complexObjects);
 
-    sut = createCache<ComplexObject>(
-        getKey: (value) => value.id,
-        jsonMapper: JsonMapper(
-          fromJson: (json) => ComplexObject.fromMap(json),
-          toJson: (value) => value.toMap(),
-        ));
+    sut = createComplexObjectCache();
 
     final result = await sut.getByKey(complexObjects[0].id);
 
@@ -245,6 +244,7 @@ void main() {
 
   test('cacheAndReplace should replace an existing value with the same key',
       () async {
+    sut = createComplexObjectCache();
     const complexObjects = [
       ComplexObject(name: 'Julian', age: 10, id: 2),
       ComplexObject(name: 'Julian', age: 12, id: 2),
@@ -259,6 +259,8 @@ void main() {
   test(
       'cacheAndReplace should not replace an existing value with the a differnt key',
       () async {
+    sut = createComplexObjectCache();
+
     const complexObjects = [
       ComplexObject(name: 'Julian', age: 10, id: 3),
       ComplexObject(name: 'Julian', age: 12, id: 2),
@@ -274,6 +276,8 @@ void main() {
 
   test('cacheAndReplaceAll should replace existing values with the same key',
       () async {
+    sut = createComplexObjectCache();
+
     const complexObjects = [
       ComplexObject(name: 'Julian', age: 10, id: 2),
       ComplexObject(name: 'Julian', age: 12, id: 3),
@@ -292,6 +296,8 @@ void main() {
   test(
       'cacheAndReplace should not replace an existing value with the a differnt key',
       () async {
+    sut = createComplexObjectCache();
+
     const complexObjects = [
       ComplexObject(name: 'Julian', age: 10, id: 3),
       ComplexObject(name: 'Julian', age: 12, id: 2),
@@ -303,6 +309,16 @@ void main() {
     final id3 = await sut.getByKey(3);
     expect(id2, equals(complexObjects[1]));
     expect(id3, equals(complexObjects[0]));
+  });
+
+  test(
+      'When Cache is created with KeyType other then int or string throw [UnsupportedKeyTypeException]',
+      () async {
+    await helpers.throwsA<UnsupportedKeyTypeException>(
+        () async => Cache<Object, Exception>(
+              '',
+              getKey: (value) => Exception(),
+            ));
   });
 }
 

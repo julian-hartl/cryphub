@@ -3,15 +3,15 @@ import 'package:logger/logger.dart';
 
 import 'json_parsing_exception.dart';
 
-class CachedObject<T> {
+class CachedObject<T, KeyType> {
   final T value;
   final JsonMapper<T>? jsonMapper;
-  final dynamic key;
+  final KeyType key;
   final DateTime cachedAt;
 
   CachedObject(this.key, this.value, this.cachedAt, this.jsonMapper);
 
-  bool hasKey(dynamic key) => this.key == key;
+  bool hasKey(KeyType key) => this.key == key;
 
   Map<String, dynamic> toJson() => {
         'value': jsonMapper?.toJson(value) ?? value,
@@ -24,13 +24,13 @@ class CachedObject<T> {
     try {
       return CachedObject(
         json['key'],
-        jsonMapper?.fromJson(json['value']) ?? json['value'],
+        jsonMapper?.fromJson(json['value'].cast<String, dynamic>()) ??
+            json['value'],
         DateTime.parse(json['cached_at']),
         jsonMapper,
       );
     } catch (e) {
-      Logger().e(e.toString());
-      throw JsonParsingException();
+      throw JsonParsingException(e.toString());
     }
   }
 

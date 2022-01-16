@@ -1,3 +1,6 @@
+import 'package:cryphub/domain/core/cache/unsupported_key_type_exception.dart';
+import 'package:flutter/foundation.dart';
+
 import 'already_initialized_exception.dart';
 import 'cache_not_initialized_exception.dart';
 import 'cached_object.dart';
@@ -6,12 +9,16 @@ import 'json_mapper.dart';
 import 'key_not_found_exception.dart';
 import 'package:hive_flutter/adapters.dart';
 
-class Cache<T> {
-  final List<CachedObject<T>> _cached = [];
+class Cache<T, KeyType> {
+  final List<CachedObject<T, KeyType>> _cached = [];
 
   //final bool Function(List<T> cache, T itemToAdd) alreadyExists;
 
-  Cache(this.cacheDirectory, {this.jsonMapper, this.getKey});
+  Cache(this.cacheDirectory, {this.jsonMapper, required this.getKey}) {
+    if (KeyType != String && KeyType != int) {
+      throw UnsupportedKeyTypeException(KeyType);
+    }
+  }
 
   /// The directory that is used to store data in local storage
   final String cacheDirectory;
@@ -20,9 +27,9 @@ class Cache<T> {
 
   /// returns the key that is used to store objects in local storage
   /// make sure that the returned value either overrides equality or extends [Equatable] to ensure working equality
-  final dynamic Function(T value)? getKey;
+  final KeyType Function(T value) getKey;
 
-  late final Box<Map<String, dynamic>> _cacheBox;
+  late final Box<Map> _cacheBox;
   bool _initialized = false;
 
   /// Returns all cached items
@@ -39,15 +46,22 @@ class Cache<T> {
 
   /// Caches all [items]
   /// Throws a [DuplicateKeyException] when an item is added with a key that already exists
-  Future<void> cacheAll(List<T> items) async {
+  Future<void> cacheAll(List<T> items, {bool replace = false}) async {
     await _checkInitialization();
     final entries = items.map((value) {
-      final key = getKey?.call(value) ?? value;
-      return CachedObject(key, value, DateTime.now(), jsonMapper);
+      final key = getKey(value);
+      return CachedObject<T, KeyType>(key, value, DateTime.now(), jsonMapper);
     });
     for (var cachedObject in entries) {
       final alreadyExists = await keyExists(cachedObject.key);
-      if (alreadyExists) throw DuplicateKeyException(cachedObject.key);
+
+      if (alreadyExists) {
+        if (replace) {
+          await delete(cachedObject.key);
+        } else {
+          throw DuplicateKeyException(cachedObject.key);
+        }
+      }
     }
     _cached.addAll(entries);
     final Map<dynamic, Map<String, dynamic>> boxEntry = {};
@@ -69,14 +83,16 @@ class Cache<T> {
     }
     _cacheBox = await Hive.openBox(cacheDirectory);
 
-    _cached.addAll(_cacheBox.values
-        .map((json) => CachedObject.fromJson(json, jsonMapper)));
+    debugPrint(_cacheBox.values.toString());
+
+    _cached.addAll(_cacheBox.values.map((json) =>
+        CachedObject.fromJson(json.cast<String, dynamic>(), jsonMapper)));
     _initialized = true;
   }
 
   /// Returns `true` when the key exists
   /// Returns `false` when the key does not exist
-  Future<bool> keyExists(dynamic key) async {
+  Future<bool> keyExists(KeyType key) async {
     try {
       await getByKey(key);
       return true;
@@ -87,7 +103,7 @@ class Cache<T> {
 
   /// Gets an object from the cache with the specified [key]
   /// Throws a [KeyNotFoundException] when object with [key] is not found
-  Future<T> getByKey(dynamic key) async {
+  Future<T> getByKey(KeyType key) async {
     await _checkInitialization();
     try {
       return _cached.firstWhere((element) => element.hasKey(key)).value;
@@ -98,7 +114,7 @@ class Cache<T> {
 
   /// Deletes an item with the specified [key]
   /// Throws a [KeyNotFoundException] when [key] does not exist
-  Future<void> delete(dynamic key) async {
+  Future<void> delete(KeyType key) async {
     if (await keyExists(key)) {
       await _cacheBox.delete(key);
       _cached.removeWhere((cachedO) => cachedO.key == key);
@@ -109,6 +125,7 @@ class Cache<T> {
 
   /// Erases everything in the cache
   Future<void> eraseAll() async {
+    await _checkInitialization();
     await _cacheBox.clear();
     _cached.clear();
   }
@@ -129,7 +146,11 @@ class Cache<T> {
     await Hive.initFlutter();
   }
 
-  Future<void> cacheAndReplace(T item) async {}
+  Future<void> cacheAndReplace(T item) async {
+    await cacheAndReplaceAll([item]);
+  }
 
-  Future<void> cacheAndReplaceAll(List<T> items) async {}
+  Future<void> cacheAndReplaceAll(List<T> items) async {
+    await cacheAll(items, replace: true);
+  }
 }

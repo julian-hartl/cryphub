@@ -76,9 +76,12 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
   Future<List<CryptoCurrency>> getCryptoCurrenciesByIds(List<int> ids) async {
     final cachedCryptoCurrencies = await cryptoCurrencyCache
         .getInTimespan(DateTime.now().subtract(const Duration(minutes: 10)));
+    final modifiableIds = List<int>.from(ids, growable: true);
     for (var element in cachedCryptoCurrencies) {
-      ids.remove(element.id);
+      modifiableIds.remove(element.id);
     }
+    ids = modifiableIds;
+
     final cryptoCurrenciesFromApi = await getCryptoCurrenciesBy(ids, "id");
     cryptoCurrencyCache.cacheAll(cryptoCurrenciesFromApi);
     return [...cachedCryptoCurrencies, ...cryptoCurrenciesFromApi];
@@ -89,9 +92,12 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
       List<String> symbols) async {
     final cachedCryptoCurrencies = await cryptoCurrencyCache
         .getInTimespan(DateTime.now().subtract(const Duration(minutes: 10)));
+    final modifiableSymbols = List<String>.from(symbols, growable: true);
+
     for (var element in cachedCryptoCurrencies) {
-      symbols.remove(element.symbol);
+      modifiableSymbols.remove(element.symbol);
     }
+    symbols = modifiableSymbols;
     final cryptoCurrenciesFromApi =
         await getCryptoCurrenciesBy(symbols, 'symbol');
     cryptoCurrencyCache.cacheAll(cryptoCurrenciesFromApi);
