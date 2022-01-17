@@ -21,8 +21,8 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with AfterLayoutMixin<SplashScreen> {
   @override
-  void afterFirstLayout(BuildContext context) {
-    configureDependencies().then((value) async {
+  void afterFirstLayout(BuildContext context) async {
+    await configureDependencies().then((value) async {
       final settings = await app.get<ISettingsRepository>().readSettings();
       ThemeProvider.controllerOf(context)
           .setTheme(settings.darkMode ? Themes.dark : Themes.light);
