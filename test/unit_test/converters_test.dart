@@ -6,7 +6,7 @@ void main() {
     test('should return a comma seperated string of all the values in the list',
         () {
       const items = ['Hello', 'World', 'I', 'am', 'here'];
-      final result = convertListToCommaSeperatedStringListing(items);
+      final result = seperateListValues(items);
       expect(result, equals('Hello,World,I,am,here'));
     });
   });

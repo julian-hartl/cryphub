@@ -128,7 +128,9 @@ class LatestCurrenciesView extends StatelessWidget {
   }
 
   Widget _buildErrorIndicator([String? message]) {
-    return Retry(message ?? pagingController.error, onRetry: () {});
+    return Retry(message ?? pagingController.error, onRetry: () {
+      pagingController.refresh();
+    });
   }
 }
 

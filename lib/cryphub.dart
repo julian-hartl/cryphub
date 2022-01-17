@@ -1,3 +1,5 @@
+import 'package:cryphub/application/blocs/splash_screen/splash_screen_bloc.dart';
+
 import 'application/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,6 +40,9 @@ class Cryphub extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => app.get<SettingsNotifierBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => app.get<SplashScreenBloc>(),
         ),
       ],
       child: ThemeProvider(

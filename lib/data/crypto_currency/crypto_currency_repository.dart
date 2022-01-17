@@ -1,3 +1,7 @@
+import 'package:cryphub/domain/network/network_response.dart';
+import 'package:cryphub/domain/network/network_service.dart';
+import 'package:cryphub/domain/network/network_timeout_exception.dart';
+
 import '../../domain/application_directories.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
@@ -14,25 +18,25 @@ import 'crypto_currency_cache.dart';
 
 @LazySingleton(as: ICryptoCurrencyRepository)
 class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
-  final Dio dio;
   late final CryptoCurrencyCache cryptoCurrencyCache;
   final Logger logger;
   final ApplicationDirectories applicationDirectories;
+  final INetworkService networkService;
 
-  late final _options = CacheOptions(
-    store: HiveCacheStore(
-      applicationDirectories.docDir,
-      hiveBoxName: 'crypto_currencies_request_storage',
-    ),
-    maxStale: const Duration(minutes: 15),
-  );
+  // late final _options = CacheOptions(
+  //   store: HiveCacheStore(
+  //     applicationDirectories.docDir,
+  //     hiveBoxName: 'crypto_currencies_request_storage',
+  //   ),
+  //   maxStale: const Duration(minutes: 15),
+  // );
   CryptoCurrencyRepository(
-    this.dio,
     this.cryptoCurrencyCache,
     this.logger,
     this.applicationDirectories,
+    this.networkService,
   ) {
-    dio.interceptors.add(DioCacheInterceptor(options: _options));
+    // dio.interceptors.add(DioCacheInterceptor(options: _options));
   }
 
   /// first page is page = 1
@@ -42,26 +46,29 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
       // await Future.delayed(const Duration(seconds: 1));
 
       // return fakeCryptoCurrencies(pageSize);
-      logger.info('Requesting latest on page $page');
       final response = await getFromCurrencyApi(
           '/cryptocurrency/listings/latest',
           queryParameters: {
             'limit': pageSize,
             'start': (page - 1) * pageSize + 1,
           });
+      checkResponse(response);
       final data = response.data['data'] as List;
       final latest = data
           .map((json) => cryptoCurrencyFromApiListingsLatest(json))
           .toList();
       await cryptoCurrencyCache.cacheAndReplaceAll(latest);
       return latest;
-    } on DioError catch (e) {
-      final String? errorMessage = errorMessageFromApiError(e);
-      logger.error(errorMessage);
-      throw ApiException(errorMessage ?? 'Unknown error');
     } catch (e) {
-      logger.error(e.toString());
-      rethrow;
+      logger.error(e);
+      throw ApiException(e.toString());
+    }
+  }
+
+  void checkResponse(NetworkResponse response) {
+    if (response.status > 299) {
+      throw ApiException(
+          errorMessageFromApiError(response.data) ?? 'Unknown error.');
     }
   }
 
@@ -85,21 +92,25 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
 
   @override
   Future<List<CryptoCurrency>> getCryptoCurrenciesByIds(List<int> ids) async {
-    final cachedCryptoCurrencies = await cryptoCurrencyCache
-        .getInTimespan(DateTime.now().subtract(const Duration(minutes: 10)));
-    final modifiableIds = List<int>.from(ids, growable: true);
-    final cachedCryptoCurrenciesWithIds = [];
-    for (var element in cachedCryptoCurrencies) {
-      modifiableIds.remove(element.id);
-      if (ids.contains(element.id)) {
-        cachedCryptoCurrenciesWithIds.add(element);
+    try {
+      final cachedCryptoCurrencies = await cryptoCurrencyCache
+          .getInTimespan(DateTime.now().subtract(const Duration(minutes: 10)));
+      final modifiableIds = List<int>.from(ids, growable: true);
+      final cachedCryptoCurrenciesWithIds = [];
+      for (var element in cachedCryptoCurrencies) {
+        modifiableIds.remove(element.id);
+        if (ids.contains(element.id)) {
+          cachedCryptoCurrenciesWithIds.add(element);
+        }
       }
-    }
-    ids = modifiableIds;
+      ids = modifiableIds;
 
-    final cryptoCurrenciesFromApi = await getCryptoCurrenciesBy(ids, "id");
-    cryptoCurrencyCache.cacheAndReplaceAll(cryptoCurrenciesFromApi);
-    return [...cachedCryptoCurrenciesWithIds, ...cryptoCurrenciesFromApi];
+      final cryptoCurrenciesFromApi = await getCryptoCurrenciesBy(ids, "id");
+      cryptoCurrencyCache.cacheAndReplaceAll(cryptoCurrenciesFromApi);
+      return [...cachedCryptoCurrenciesWithIds, ...cryptoCurrenciesFromApi];
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override
@@ -130,43 +141,37 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
       if (l.isEmpty) {
         return List.empty();
       } // https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyQuotesLatest
-      final commaSeperated = convertListToCommaSeperatedStringListing(l);
+      final commaSeperated = seperateListValues(l);
       final response = await getFromCurrencyApi(
         '/cryptocurrency/quotes/latest',
         queryParameters: {what: commaSeperated},
       );
+      checkResponse(response);
+
       final data = response.data['data'] as Map<String, dynamic>;
       final currencies = data.entries
           .map((entry) => cryptoCurrencyFromApiListingsLatest(entry.value))
           .toList();
       return currencies;
-    } on DioError catch (e) {
-      final String? errorMessage = errorMessageFromApiError(e);
-      logger.warning(e.toString());
-      // logger.warning(errorMessage);
-
-      throw ApiException(errorMessage ?? e.toString());
     } catch (e) {
       logger.error(e.toString());
-      rethrow;
+      throw ApiException(e.toString());
     }
   }
 
-  Future<Response> getFromCurrencyApi(
+  Future<NetworkResponse> getFromCurrencyApi(
     String path, {
     Map<String, dynamic>? queryParameters,
   }) async {
-    return dio.get(
+    return await networkService.get(
       config.coinMarketCapApiUrl + path,
-      options: Options(
-        headers: {'X-CMC_PRO_API_KEY': config.coinMarketCapApiKey},
-      ),
+      headers: {'X-CMC_PRO_API_KEY': config.coinMarketCapApiKey},
       queryParameters: queryParameters,
     );
   }
 
-  String? errorMessageFromApiError(DioError e) {
-    final String? errorMessage = e.response?.data['status']['error_message'];
+  String? errorMessageFromApiError(dynamic data) {
+    final String? errorMessage = data['status']['error_message'];
     return errorMessage;
   }
 

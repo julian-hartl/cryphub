@@ -7,13 +7,19 @@ import 'package:cryphub/domain/application_directories.dart';
 import 'package:cryphub/domain/core/api_exception.dart';
 import 'package:cryphub/domain/core/cache/cache.dart';
 import 'package:cryphub/domain/core/logger/logger.dart';
+import 'package:cryphub/domain/network/network_response.dart';
+import 'package:cryphub/domain/network/network_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http_mock_adapter/http_mock_adapter.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 
+import 'crypto_currency_repository_test.mocks.dart';
 import 'helpers/data_sets.dart';
 import 'helpers/functions.dart' as helpers;
 
+@GenerateMocks([INetworkService])
 void main() {
   String serverError(String path, DioAdapter dioAdapter) {
     const errorMessage = 'This is an error message';
@@ -26,26 +32,23 @@ void main() {
   }
 
   group('CryptoCurrencyRepository', () {
-    late Dio dio;
-    late DioAdapter dioAdapter;
     late CryptoCurrencyRepository sut;
     late CryptoCurrencyCache cryptoCurrencyCache;
+    late MockINetworkService networkService;
     setUpAll(() async {
       await Cache.init();
       await configureDependencies();
     });
     setUp(() {
-      dio = Dio();
-      dioAdapter = DioAdapter(dio: dio);
-      dio.httpClientAdapter = dioAdapter;
+      networkService = MockINetworkService();
       cryptoCurrencyCache = CryptoCurrencyCache(
         cacheDirectory: 'test_crypto_currencies',
       );
       sut = CryptoCurrencyRepository(
-        dio,
         cryptoCurrencyCache,
         Logger(),
         app.get<ApplicationDirectories>(),
+        networkService,
       );
     });
     tearDown(() async {
@@ -57,17 +60,18 @@ void main() {
       final mockData = {'mock': 12};
       final url = config.coinMarketCapApiUrl + path;
       final queryParameters = {'parameter': 1};
-      dioAdapter.onGet(url, (server) {
-        server.reply(status, mockData);
+      when(networkService.get(
+        url,
+        headers: anyNamed('headers'),
+        queryParameters: anyNamed('queryParameters'),
+      )).thenAnswer((_) async {
+        return NetworkResponse(status: status, data: mockData);
       });
       final response =
           await sut.getFromCurrencyApi(path, queryParameters: queryParameters);
       // latest request
-      final request = dioAdapter.history[0].request;
 
-      expect(request.method, equals(RequestMethods.get));
-      expect(request.route, equals(url));
-      expect(response.statusCode, equals(status));
+      expect(response.status, equals(status));
       expect(response.data, equals(mockData));
       // expect(request.queryParameters, equals(queryParameters));
 
@@ -80,13 +84,19 @@ void main() {
     });
 
     test('getLatest', () async {
-      const path = '/cryptocurrency/listings/latest';
+      final url =
+          config.coinMarketCapApiUrl + '/cryptocurrency/listings/latest';
       final data = latestDataJson;
       final cryptoCurrencies = latestCurrencies;
       const pageSize = 20;
-      dioAdapter.onGet(config.coinMarketCapApiUrl + path, (server) {
-        server.reply(200, data);
+      when(networkService.get(
+        url,
+        headers: anyNamed('headers'),
+        queryParameters: anyNamed('queryParameters'),
+      )).thenAnswer((_) async {
+        return NetworkResponse(status: 200, data: data);
       });
+
       final latest = await sut.getLatest(1, pageSize);
       expect(latest, equals(cryptoCurrencies));
     });
@@ -98,19 +108,27 @@ void main() {
     });
 
     test('getCurrenciesByIds', () async {
-      const path = '/cryptocurrency/quotes/latest';
+      final url = config.coinMarketCapApiUrl + '/cryptocurrency/quotes/latest';
       const data = quotesLatestIdsDataJson;
-      dioAdapter.onGet(
-        config.coinMarketCapApiUrl + path,
-        (server) {
-          server.reply(200, data);
-        },
-        queryParameters: {
-          'id': convertListToCommaSeperatedStringListing(quotesLatestIds)
-        },
-      );
+      when(networkService.get(
+        url,
+        headers: anyNamed('headers'),
+        queryParameters: anyNamed('queryParameters'),
+      )).thenAnswer((_) async {
+        return const NetworkResponse(status: 200, data: data);
+      });
+
       final currencies = await sut.getCryptoCurrenciesByIds(quotesLatestIds);
       expect(currencies, equals(quotesLatestCurrencies));
+      verify(
+        networkService.get(
+          url,
+          queryParameters: {'id': seperateListValues(quotesLatestIds)},
+          headers: {
+            'X-CMC_PRO_API_KEY': config.coinMarketCapApiKey,
+          },
+        ),
+      );
     });
 
     test('getCurrenciesByIds error', () async {
@@ -126,25 +144,29 @@ void main() {
     });
 
     test('getCurrenciesBySymbols', () async {
-      const path = '/cryptocurrency/quotes/latest';
+      final url = config.coinMarketCapApiUrl + '/cryptocurrency/quotes/latest';
+
       const data = quotesLatestSymbolsDataJson;
-      dioAdapter.onGet(
-        config.coinMarketCapApiUrl + path,
-        (server) {
-          server.reply(200, data);
-        },
-        queryParameters: {
-          'symbol':
-              convertListToCommaSeperatedStringListing(quotesLatestSymbols)
-        },
-      );
-      /*
-      expect(dioAdapter.history[0].request.queryParameters,
-          equals({'symbol': 'BTC, ETH'}));
-          */
+      when(networkService.get(
+        url,
+        headers: anyNamed('headers'),
+        queryParameters: anyNamed('queryParameters'),
+      )).thenAnswer((_) async {
+        return const NetworkResponse(status: 200, data: data);
+      });
+
       final currencies =
           await sut.getCryptoCurrencyBySymbols(quotesLatestSymbols);
       expect(currencies, equals(quotesLatestCurrencies));
+      verify(
+        networkService.get(
+          url,
+          queryParameters: {'symbol': seperateListValues(quotesLatestSymbols)},
+          headers: {
+            'X-CMC_PRO_API_KEY': config.coinMarketCapApiKey,
+          },
+        ),
+      );
     });
 
     test('getCurrenciesBySymbols returns empty list when empty list is passed',
@@ -160,13 +182,20 @@ void main() {
     });
 
     test('getLatest should cache the returned data', () async {
-      const path = '/cryptocurrency/listings/latest';
+      final url =
+          config.coinMarketCapApiUrl + '/cryptocurrency/listings/latest';
+
       final data = latestDataJson;
       final cryptoCurrencies = latestCurrencies;
       const pageSize = 20;
-      dioAdapter.onGet(config.coinMarketCapApiUrl + path, (server) {
-        server.reply(200, data);
+      when(networkService.get(
+        url,
+        headers: anyNamed('headers'),
+        queryParameters: anyNamed('queryParameters'),
+      )).thenAnswer((_) async {
+        return NetworkResponse(status: 200, data: data);
       });
+
       await sut.getLatest(1, pageSize);
       expect(cryptoCurrencyCache.cached, equals(cryptoCurrencies));
     });

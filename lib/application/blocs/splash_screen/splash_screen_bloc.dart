@@ -4,11 +4,13 @@ import 'package:cryphub/domain/core/cache/cache.dart';
 import 'package:cryphub/domain/core/logger/logger.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:injectable/injectable.dart';
 
 part 'splash_screen_event.dart';
 part 'splash_screen_state.dart';
 part 'splash_screen_bloc.freezed.dart';
 
+@lazySingleton
 class SplashScreenBloc extends Bloc<SplashScreenEvent, SplashScreenState> {
   final IConnectivityService connectivityService;
   final Logger logger;

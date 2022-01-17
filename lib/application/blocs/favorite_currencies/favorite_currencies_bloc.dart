@@ -38,7 +38,7 @@ class FavoriteCurrenciesBloc
 
         emit(FavoriteCurrenciesState.updatedFavorites(KtList.from(favorites)));
       } catch (e) {
-        logger.warning(e);
+        logger.error(e);
 
         emit(const FavoriteCurrenciesState.error('Api exception occurred.'));
       }
