@@ -142,7 +142,6 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
         expandableSidebarController.dispose();
       } catch (_) {}
     }
-    // sidebarAnimationController.removeListener(() {});
     super.dispose();
   }
 
@@ -159,13 +158,6 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
         if (widget.openBySwipe) {
           const double sensitivity = 0.5;
           final dx = details.delta.dx;
-          // todo: remove swiping checks
-          if (dx < 0) {
-            if (!expandableSidebarController.rightSwipeAllowed) return;
-          }
-          if (dx > 0) {
-            if (!expandableSidebarController.leftSwipeAllowed) return;
-          }
 
           if (dx < -sensitivity || dx > sensitivity) {
             // if (swipedOffset < 0.5 && swipedOffset > -0.5) return;
@@ -264,28 +256,6 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
       ),
     );
   }
-
-  /*
-  double sidebarOpenedBy() {
-    debugPrint('swipedOffset: $swipedOffset');
-    final sidebarOpenedProgress = swipedOffset / sidebarWidth;
-    debugPrint(
-        'sidebarOpenedProgress: ${sidebarOpenedProgress.toStringAsFixed(2)}');
-    if (sidebarOpenedProgress >= 1.0) return 1.0;
-    if (sidebarOpenedProgress <= -1.0) return 0.0;
-    if (sidebarOpenedProgress > 0) {
-      // expandableSidebarController.openSidebar();
-      return sidebarOpenedProgress;
-    }
-    // Left swipe
-    else if (sidebarOpenedProgress < 0) {
-      // expandableSidebarController.closeSidebar();
-      return 1 - (sidebarOpenedProgress * -1);
-    } else {
-      return 0.0;
-    }
-  }
-  */
 }
 
 class ExpandableSidebarController extends ChangeNotifier {
