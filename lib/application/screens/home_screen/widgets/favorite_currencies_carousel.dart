@@ -1,15 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import '../../../../configure_dependencies.dart';
-import '../../../../data/utils/dominant_color_finder.dart';
-import 'package:gap/gap.dart';
-import 'package:kt_dart/collection.dart';
-import '../../../blocs/favorite_currencies/favorite_currencies_bloc.dart';
-import '../../../widgets/retry.dart';
-import '../../../../data/utils/converters.dart';
-import '../../../../domain/crypto_currency/crypto_currency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
+import 'package:kt_dart/collection.dart';
+
+import '../../../../configure_dependencies.dart';
+import '../../../../data/utils/converters.dart';
+import '../../../../data/utils/dominant_color_finder.dart';
+import '../../../../domain/crypto_currency/crypto_currency.dart';
+import '../../../blocs/favorite_currencies/favorite_currencies_bloc.dart';
+import '../../../widgets/retry.dart';
 
 class FavoriteCurrenciesCarousel extends StatelessWidget {
   const FavoriteCurrenciesCarousel({
@@ -46,10 +47,11 @@ class FavoriteCurrenciesCarousel extends StatelessWidget {
                         ? favorites.size - page * itemsPerPage
                         : itemsPerPage;
                     return FavoriteCurrenciesSlidePage(
-                      itemCount: itemCount,
                       itemsPerPage: itemsPerPage,
                       currentPage: page,
                       favorites: favorites,
+                      templateAmount: itemsPerPage - itemCount,
+                      itemCount: itemCount,
                     );
                   },
                   itemCount: pages,
@@ -83,16 +85,18 @@ class FavoriteCurrenciesCarousel extends StatelessWidget {
 class FavoriteCurrenciesSlidePage extends StatefulWidget {
   const FavoriteCurrenciesSlidePage({
     Key? key,
-    required this.itemCount,
     required this.itemsPerPage,
     required this.favorites,
     required this.currentPage,
+    required this.templateAmount,
+    required this.itemCount,
   }) : super(key: key);
 
-  final int itemCount;
   final int itemsPerPage;
   final KtList<CryptoCurrency> favorites;
   final int currentPage;
+  final int itemCount;
+  final int templateAmount;
 
   @override
   State<FavoriteCurrenciesSlidePage> createState() =>
@@ -107,19 +111,25 @@ class _FavoriteCurrenciesSlidePageState
     super.build(context);
     return Center(
       child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 15,
-          mainAxisSpacing: 15,
-        ),
-        scrollDirection: Axis.horizontal,
-        shrinkWrap: widget.itemCount > 2,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: widget.itemCount,
-        itemBuilder: (context, gridIndex) => FavoriteCurrencyCard(
-            favorite: widget.favorites[
-                widget.currentPage * widget.itemsPerPage + gridIndex]),
-      ),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 15,
+            mainAxisSpacing: 15,
+          ),
+          scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: widget.itemCount + widget.templateAmount,
+          itemBuilder: (context, gridIndex) {
+            if (gridIndex < widget.itemCount) {
+              return FavoriteCurrencyCard(
+                favorite: widget.favorites[
+                    widget.currentPage * widget.itemsPerPage + gridIndex],
+              );
+            } else {
+              return Container();
+            }
+          }),
     );
   }
 

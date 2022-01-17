@@ -83,21 +83,23 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                 ),
                 floating: true,
               ),
-              const SliverPadding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                sliver: FavoriteCurrenciesCarousel(),
-              ),
+              const FavoriteCurrenciesCarousel(),
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                  const Text('Latest'),
-                ])),
+                  delegate: SliverChildListDelegate(
+                    [
+                      const Text('Latest'),
+                    ],
+                  ),
+                ),
               ),
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                sliver:
-                    LatestCurrenciesView(pagingController: pagingController),
+                sliver: LatestCurrenciesView(
+                  pagingController: pagingController,
+                ),
               ),
             ],
           ),
