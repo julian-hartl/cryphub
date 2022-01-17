@@ -23,7 +23,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   ) : super(const SettingsState.loadingSettings()) {
     on<_ToggleDarkMode>((event, emit) async {
       try {
-        final currentSettings = await settingsRepository.readSettings();
+        final currentSettings = settingsRepository.readSettings();
         final updatedSettings = currentSettings.copyWith(darkMode: event.value);
         await settingsRepository.updateSettings(updatedSettings);
         settingsNotifierBloc.add(
@@ -38,7 +38,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<_LoadSettings>((event, emit) async {
       emit(const SettingsState.loadingSettings());
       try {
-        final settings = await settingsRepository.readSettings();
+        final settings = settingsRepository.readSettings();
         emit(SettingsState.loadedSettings(settings));
       } catch (_) {
         emit(const SettingsState.error('Could not load settings...'));

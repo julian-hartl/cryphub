@@ -1,6 +1,3 @@
-import 'package:cryphub/domain/settings/settings.dart';
-import 'package:cryphub/domain/settings/settings_repository.dart';
-
 import 'application/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +9,7 @@ import 'application/blocs/latest_currencies/latest_currencies_bloc.dart';
 import 'application/blocs/settings/settings_bloc.dart';
 import 'application/blocs/settings_notifier/settings_notifier_bloc.dart';
 import 'configure_dependencies.dart';
+import 'domain/settings/settings_repository.dart';
 import 'themes.dart';
 
 class Cryphub extends StatelessWidget {
@@ -42,42 +40,34 @@ class Cryphub extends StatelessWidget {
           create: (context) => app.get<SettingsNotifierBloc>(),
         ),
       ],
-      child: FutureBuilder<Settings>(
-          future: app.get<ISettingsRepository>().readSettings(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Container();
-            }
-
-            return ThemeProvider(
-              child: ThemeConsumer(
-                child: Builder(
-                  builder: (context) => MaterialApp.router(
-                    title: 'Cryphub',
-                    theme: ThemeProvider.themeOf(context).data,
-                    routerDelegate: appRouter.delegate(),
-                    routeInformationParser: appRouter.defaultRouteParser(),
-                  ),
-                ),
-              ),
-              themes: [
-                AppTheme(
-                  id: Themes.dark,
-                  data: dark(context),
-                  description: 'Dark theme',
-                ),
-                AppTheme(
-                  id: Themes.light,
-                  data: light(context),
-                  description: 'Light theme',
-                ),
-              ],
-              defaultThemeId:
-                  snapshot.data!.darkMode ? Themes.dark : Themes.light,
-              loadThemeOnInit: false,
-              saveThemesOnChange: false,
-            );
-          }),
+      child: ThemeProvider(
+        child: ThemeConsumer(
+          child: Builder(
+            builder: (context) => MaterialApp.router(
+              title: 'Cryphub',
+              theme: ThemeProvider.themeOf(context).data,
+              routerDelegate: appRouter.delegate(),
+              routeInformationParser: appRouter.defaultRouteParser(),
+            ),
+          ),
+        ),
+        themes: [
+          AppTheme(
+            id: Themes.dark,
+            data: dark(context),
+            description: 'Dark theme',
+          ),
+          AppTheme(
+            id: Themes.light,
+            data: light(context),
+            description: 'Light theme',
+          ),
+        ],
+        defaultThemeId: app.get<ISettingsRepository>().readSettings().darkMode
+            ? Themes.dark
+            : Themes.light,
+        saveThemesOnChange: false,
+      ),
     );
   }
 }

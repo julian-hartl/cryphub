@@ -19,14 +19,14 @@ class SettingsRepository implements ISettingsRepository {
   Settings? _settings;
 
   @override
-  Future<Settings> readSettings() async {
+  Settings readSettings() {
     if (_settings != null) {
       return _settings!;
     }
     final settingsJson = sharedPreferences.getString('settings');
     if (settingsJson == null) {
       final defaultSettings = Settings.defaultSettings();
-      await updateSettings(defaultSettings);
+      updateSettings(defaultSettings);
       _settings = defaultSettings;
       return defaultSettings;
     }
