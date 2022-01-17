@@ -83,7 +83,10 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                 ),
                 floating: true,
               ),
-              const FavoriteCurrenciesCarousel(),
+              const SliverPadding(
+                padding: EdgeInsets.only(top: 8.0),
+                sliver: FavoriteCurrenciesCarousel(),
+              ),
               SliverPadding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -149,13 +152,16 @@ class HomeScreenSidebar extends StatelessWidget {
               height: 25,
             ),
             GestureDetector(
-              onTap: () {
+              behavior: HitTestBehavior.opaque,
+              onTap: () async {
                 // Navigator.of(context).push(MaterialPageRoute(
                 //   builder: (context) => SettingsScreen(),
                 // ));
-                AutoRouter.of(context).push(const SettingsScreenRoute());
+                await AutoRouter.of(context).push(const SettingsScreenRoute());
+                sidebarController.closeSidebar();
               },
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: const [
                   Icon(Icons.settings),
                   Gap(10),
