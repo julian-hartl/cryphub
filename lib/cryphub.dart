@@ -53,6 +53,7 @@ class Cryphub extends StatelessWidget {
               theme: ThemeProvider.themeOf(context).data,
               routerDelegate: appRouter.delegate(),
               routeInformationParser: appRouter.defaultRouteParser(),
+              debugShowCheckedModeBanner: false,
             ),
           ),
         ),
