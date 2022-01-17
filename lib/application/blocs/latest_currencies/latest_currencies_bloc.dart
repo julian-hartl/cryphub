@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import '../../../domain/core/logger/logger.dart';
-import '../../../data/crypto_currency/crypto_currency_repository.dart';
 import '../../../domain/crypto_currency/crypto_currency.dart';
 import '../../../domain/crypto_currency/crypto_currency_repository.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';

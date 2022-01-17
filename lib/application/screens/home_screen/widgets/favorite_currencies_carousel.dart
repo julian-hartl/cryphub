@@ -57,6 +57,8 @@ class FavoriteCurrenciesCarousel extends StatelessWidget {
                     enableInfiniteScroll: false,
                     disableCenter: true,
                     viewportFraction: 1,
+                    enlargeCenterPage: true,
+                    scrollPhysics: const BouncingScrollPhysics(),
                   ),
                 );
               },

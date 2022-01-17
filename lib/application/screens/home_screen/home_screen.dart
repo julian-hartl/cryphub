@@ -63,66 +63,13 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
         sidebarWidth: MediaQuery.of(context).size.width * 0.8,
         sidebarColor: Theme.of(context).colorScheme.surface,
         backgroundColor: Theme.of(context).colorScheme.background,
-        sidebar: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    sidebarController.closeSidebar();
-                  },
-                  child: Icon(
-                    Icons.menu,
-                    size: 50,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onBackground
-                        .withOpacity(0.9),
-                  ),
-                ),
-                const Gap(10),
-                const Text(
-                  'Hello!',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 30.0,
-                    letterSpacing: 2,
-                  ),
-                ),
-                const Divider(
-                  height: 25,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    // Navigator.of(context).push(MaterialPageRoute(
-                    //   builder: (context) => SettingsScreen(),
-                    // ));
-                    AutoRouter.of(context).push(const SettingsScreenRoute());
-                  },
-                  child: Row(
-                    children: const [
-                      Icon(Icons.settings),
-                      Gap(10),
-                      Text(
-                        'Settings',
-                        style: TextStyle(
-                          fontSize: 19,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
+        sidebar: HomeScreenSidebar(sidebarController: sidebarController),
         child: RefreshIndicator(
           onRefresh: () async {
             pagingController.refresh();
           },
           child: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
             slivers: [
               SliverAppBar(
                 title: Text(
@@ -154,6 +101,72 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class HomeScreenSidebar extends StatelessWidget {
+  const HomeScreenSidebar({
+    Key? key,
+    required this.sidebarController,
+  }) : super(key: key);
+
+  final ExpandableSidebarController sidebarController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () {
+                sidebarController.closeSidebar();
+              },
+              child: Icon(
+                Icons.menu,
+                size: 50,
+                color:
+                    Theme.of(context).colorScheme.onBackground.withOpacity(0.9),
+              ),
+            ),
+            const Gap(10),
+            const Text(
+              'Hello!',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 30.0,
+                letterSpacing: 2,
+              ),
+            ),
+            const Divider(
+              height: 25,
+            ),
+            GestureDetector(
+              onTap: () {
+                // Navigator.of(context).push(MaterialPageRoute(
+                //   builder: (context) => SettingsScreen(),
+                // ));
+                AutoRouter.of(context).push(const SettingsScreenRoute());
+              },
+              child: Row(
+                children: const [
+                  Icon(Icons.settings),
+                  Gap(10),
+                  Text(
+                    'Settings',
+                    style: TextStyle(
+                      fontSize: 19,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
         ),
       ),
     );

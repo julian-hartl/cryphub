@@ -42,11 +42,12 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
       // await Future.delayed(const Duration(seconds: 1));
 
       // return fakeCryptoCurrencies(pageSize);
+      logger.info('Requesting latest on page $page');
       final response = await getFromCurrencyApi(
           '/cryptocurrency/listings/latest',
           queryParameters: {
             'limit': pageSize,
-            'start': page,
+            'start': (page - 1) * pageSize + 1,
           });
       final data = response.data['data'] as List;
       final latest = data
