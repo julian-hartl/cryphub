@@ -1,5 +1,6 @@
 import 'package:cryphub/config.dart';
 import 'package:cryphub/configure_dependencies.dart';
+import 'package:cryphub/constants.dart';
 import 'package:cryphub/data/crypto_currency/crypto_currency_cache.dart';
 import 'package:cryphub/data/crypto_currency/crypto_currency_repository.dart';
 import 'package:cryphub/data/utils/converters.dart';
@@ -22,7 +23,7 @@ import 'helpers/functions.dart' as helpers;
 void main() {
   String serverError(String path, DioAdapter dioAdapter) {
     const errorMessage = 'This is an error message';
-    dioAdapter.onGet(config.coinMarketCapApiUrl + path, (server) {
+    dioAdapter.onGet(kCoinMarketCapApiUrl + path, (server) {
       server.reply(400, {
         'status': {'error_message': errorMessage}
       });
@@ -57,7 +58,7 @@ void main() {
       const path = '/api';
       const status = 200;
       final mockData = {'mock': 12};
-      final url = config.coinMarketCapApiUrl + path;
+      final url = kCoinMarketCapApiUrl + path;
       final queryParameters = {'parameter': 1};
       when(networkService.get(
         url,
@@ -83,8 +84,7 @@ void main() {
     });
 
     test('getLatest', () async {
-      final url =
-          config.coinMarketCapApiUrl + '/cryptocurrency/listings/latest';
+      final url = kCoinMarketCapApiUrl + '/cryptocurrency/listings/latest';
       final data = latestDataJson;
       final cryptoCurrencies = latestCurrencies;
       const pageSize = 20;
@@ -107,7 +107,7 @@ void main() {
     });
 
     test('getCurrenciesByIds', () async {
-      final url = config.coinMarketCapApiUrl + '/cryptocurrency/quotes/latest';
+      final url = kCoinMarketCapApiUrl + '/cryptocurrency/quotes/latest';
       const data = quotesLatestIdsDataJson;
       when(networkService.get(
         url,
@@ -143,7 +143,7 @@ void main() {
     });
 
     test('getCurrenciesBySymbols', () async {
-      final url = config.coinMarketCapApiUrl + '/cryptocurrency/quotes/latest';
+      final url = kCoinMarketCapApiUrl + '/cryptocurrency/quotes/latest';
 
       const data = quotesLatestSymbolsDataJson;
       when(networkService.get(
@@ -181,8 +181,7 @@ void main() {
     });
 
     test('getLatest should cache the returned data', () async {
-      final url =
-          config.coinMarketCapApiUrl + '/cryptocurrency/listings/latest';
+      final url = kCoinMarketCapApiUrl + '/cryptocurrency/listings/latest';
 
       final data = latestDataJson;
       final cryptoCurrencies = latestCurrencies;

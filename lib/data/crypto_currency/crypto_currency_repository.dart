@@ -1,3 +1,4 @@
+import 'package:cryphub/constants.dart';
 import 'package:cryphub/domain/network/network_response.dart';
 import 'package:cryphub/domain/network/network_service.dart';
 import 'package:cryphub/domain/network/network_timeout_exception.dart';
@@ -164,7 +165,7 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
     Map<String, dynamic>? queryParameters,
   }) async {
     return await networkService.get(
-      config.coinMarketCapApiUrl + path,
+      kCoinMarketCapApiUrl + path,
       headers: {'X-CMC_PRO_API_KEY': config.coinMarketCapApiKey},
       queryParameters: queryParameters,
     );
