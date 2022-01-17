@@ -27,10 +27,20 @@ class FavoriteCurrenciesCarousel extends StatelessWidget {
             child: state.when(
               updatedFavorites: (favorites) {
                 if (favorites.isEmpty()) {
-                  return const Center(
-                    child: Text(
-                      'You currently don\'t have\nany favorite currencies...',
-                      textAlign: TextAlign.center,
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(
+                          Icons.favorite,
+                          size: 100,
+                        ),
+                        Gap(10),
+                        Text(
+                          'You currently don\'t have\nany favorite currencies...',
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
                   );
                 }
