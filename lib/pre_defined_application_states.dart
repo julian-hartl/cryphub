@@ -5,7 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'data/crypto_currency/crypto_currency_cache.dart';
 
 @module
-abstract class PreDefinedApplicationState {
+abstract class PreDefinedApplicationStates {
   @lazySingleton
   CryptoCurrencyCache cryptoCurrencyCache() => CryptoCurrencyCache();
 

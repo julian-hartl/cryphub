@@ -9,7 +9,6 @@ import 'package:cryphub/domain/core/cache/cache.dart';
 import 'package:cryphub/domain/core/logger/logger.dart';
 import 'package:cryphub/domain/network/network_response.dart';
 import 'package:cryphub/domain/network/network_service.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:mockito/annotations.dart';
