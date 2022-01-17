@@ -150,27 +150,6 @@ class FavoriteCurrencyCard extends StatefulWidget {
 }
 
 class _FavoriteCurrencyCardState extends State<FavoriteCurrencyCard> {
-  @override
-  void initState() {
-    try {
-      app
-          .get<DominantColorFinder>()
-          .find(CachedNetworkImageProvider(widget.favorite.iconUrl))
-          .then((value) {
-        setState(() {
-          computedDominantColor = Future.value(value);
-        });
-      }).catchError((_) {
-        setState(() {
-          computedDominantColor =
-              Future.value(Theme.of(context).colorScheme.primary);
-        });
-      });
-    } catch (_) {}
-
-    super.initState();
-  }
-
   Future<void> computeOnDominantColor() async {
     if (computedOnDominantColor != null) return;
     computedOnDominantColor =
@@ -184,8 +163,28 @@ class _FavoriteCurrencyCardState extends State<FavoriteCurrencyCard> {
 
   Future<Color>? computedDominantColor;
 
+  String? lastUsedIconUrl;
+
   @override
   Widget build(BuildContext context) {
+    try {
+      if (lastUsedIconUrl != widget.favorite.iconUrl) {
+        app
+            .get<DominantColorFinder>()
+            .find(CachedNetworkImageProvider(widget.favorite.iconUrl))
+            .then((value) {
+          lastUsedIconUrl = widget.favorite.iconUrl;
+          setState(() {
+            computedDominantColor = Future.value(value);
+          });
+        }).catchError((_) {
+          setState(() {
+            computedDominantColor =
+                Future.value(Theme.of(context).colorScheme.primary);
+          });
+        });
+      }
+    } catch (_) {}
     return FutureBuilder<Color>(
         future: computedDominantColor,
         builder: (context, snapshot) {
