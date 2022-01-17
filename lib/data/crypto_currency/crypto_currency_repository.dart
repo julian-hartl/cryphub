@@ -1,15 +1,10 @@
 import 'package:cryphub/constants.dart';
 import 'package:cryphub/domain/network/network_response.dart';
 import 'package:cryphub/domain/network/network_service.dart';
-import 'package:cryphub/domain/network/network_timeout_exception.dart';
-
-import '../../domain/application_directories.dart';
-import 'package:dio/dio.dart';
-import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
-import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../config.dart';
+import '../../domain/application_directories.dart';
 import '../../domain/core/api_exception.dart';
 import '../../domain/core/logger/logger.dart';
 import '../../domain/crypto_currency/crypto_currency.dart';
@@ -73,7 +68,7 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
     }
   }
 
-  // To see format in which the data is returned from the api, visit: https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyListingsHistorical
+  /// To see format in which the data is returned from the api, visit: https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyListingsHistorical
   CryptoCurrency cryptoCurrencyFromApiListingsLatest(
       Map<String, dynamic> json) {
     final id = json['id'];

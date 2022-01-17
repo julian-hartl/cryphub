@@ -14,12 +14,10 @@ class FavoriteCurrenciesRepository implements IFavoriteCurrenicesRepository {
 
   List<String>? _favoritesSymbols;
 
-  /// returns all favorite currencies as their symbols
   @override
   Future<List<String>> getFavorites() async {
     await _initFavoritesSymbols();
     logger.info(_favoritesSymbols);
-
     return _favoritesSymbols!;
   }
 

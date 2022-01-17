@@ -3,16 +3,20 @@ import 'package:logger/logger.dart' as logger;
 
 @lazySingleton
 class Logger {
-  final logger.Logger log = logger.Logger();
+  final logger.Logger _log = logger.Logger();
+
+  /// Log at message level info
   void info(dynamic info) {
-    log.i(info);
+    _log.i(info);
   }
 
+  /// Log at message level error
   void error(dynamic message) {
-    log.e(message);
+    _log.e(message);
   }
 
+  /// Log at message level warning
   void warning(dynamic warning) {
-    log.w(warning);
+    _log.w(warning);
   }
 }

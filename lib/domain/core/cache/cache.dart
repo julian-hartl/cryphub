@@ -8,10 +8,11 @@ import 'json_mapper.dart';
 import 'key_not_found_exception.dart';
 import 'unsupported_key_type_exception.dart';
 
+/// [T] is the type that should be stored in the cache.
+/// [KeyType] is the type that should be used by the key.
+/// [KeyType] can be of type [String] and [int].
 class Cache<T, KeyType> {
   final List<CachedObject<T, KeyType>> _cached = [];
-
-  //final bool Function(List<T> cache, T itemToAdd) alreadyExists;
 
   Cache(this.cacheDirectory, {this.jsonMapper, required this.getKey}) {
     if (KeyType != String && KeyType != int) {
@@ -19,32 +20,36 @@ class Cache<T, KeyType> {
     }
   }
 
-  /// The directory that is used to store data in local storage
+  /// The directory that is used to store data in local storage.
   final String cacheDirectory;
 
+  /// [JsonMapper] provides methods to ensure correct json parsing.
   final JsonMapper<T>? jsonMapper;
 
-  /// returns the key that is used to store objects in local storage
-  /// make sure that the returned value either overrides equality or extends [Equatable] to ensure working equality
+  /// Returns the key that is used to store objects in local storage.
+  /// Make sure that the returned value either overrides equality or extends [Equatable] to ensure working equality.
   final KeyType Function(T value) getKey;
 
   late final Box<Map> _cacheBox;
   bool _initialized = false;
 
-  /// Returns all cached items
-  /// Throws a [CacheNotInitializedException] when initialize has been not been called yet
+  /// Returns all cached items.
+  /// Throws a [CacheNotInitializedException] when initialize has been not been called yet.
   List<T> get cached {
     if (!_initialized) throw CacheNotInitializedException();
     return _cached.map((cachedO) => cachedO.value).toList();
   }
 
-  /// caches the [item]
-  Future<void> cache(T item) async {
+  /// Caches the [item].
+  /// Throws a [DuplicateKeyException] when an item is added with a key that already exists.
+  /// When [replace] is `true` the item is just overriden.
+  Future<void> cache(T item, {bool replace = false}) async {
     return await cacheAll([item]);
   }
 
-  /// Caches all [items]
-  /// Throws a [DuplicateKeyException] when an item is added with a key that already exists
+  /// Caches all [items].
+  /// Throws a [DuplicateKeyException] when an item is added with a key that already exists.
+  /// When [replace] is `true` the items are just overriden.
   Future<void> cacheAll(List<T> items, {bool replace = false}) async {
     await _checkInitialization();
     final entries = items.map((value) {
@@ -74,8 +79,8 @@ class Cache<T, KeyType> {
     if (!_initialized) await initialize();
   }
 
-  /// Loads data from local storage
-  /// Throws an [AlreadyInitializedException] when the cache has alredy been initialized
+  /// Loads data from local storage.
+  /// Throws an [AlreadyInitializedException] when the cache has alredy been initialized.
   Future<void> initialize() async {
     if (_initialized) {
       throw AlreadyInitializedException();
@@ -87,8 +92,8 @@ class Cache<T, KeyType> {
     _initialized = true;
   }
 
-  /// Returns `true` when the key exists
-  /// Returns `false` when the key does not exist
+  /// Returns `true` when the key exists.
+  /// Returns `false` when the key does not exist.
   Future<bool> keyExists(KeyType key) async {
     try {
       await getByKey(key);
@@ -98,8 +103,8 @@ class Cache<T, KeyType> {
     }
   }
 
-  /// Gets an object from the cache with the specified [key]
-  /// Throws a [KeyNotFoundException] when object with [key] is not found
+  /// Gets an object from the cache with the specified [key].
+  /// Throws a [KeyNotFoundException] when object with [key] is not found.
   Future<T> getByKey(KeyType key) async {
     await _checkInitialization();
     try {
@@ -109,8 +114,8 @@ class Cache<T, KeyType> {
     }
   }
 
-  /// Deletes an item with the specified [key]
-  /// Throws a [KeyNotFoundException] when [key] does not exist
+  /// Deletes an item with the specified [key].
+  /// Throws a [KeyNotFoundException] when [key] does not exist.
   Future<void> delete(KeyType key) async {
     if (await keyExists(key)) {
       await _cacheBox.delete(key);
@@ -120,13 +125,14 @@ class Cache<T, KeyType> {
     }
   }
 
-  /// Erases everything in the cache
+  /// Erases everything in the cache.
   Future<void> eraseAll() async {
     await _checkInitialization();
     await _cacheBox.clear();
     _cached.clear();
   }
 
+  /// Returns all items that were cached [from] to [until].
   Future<List<T>> getInTimespan(DateTime from, {DateTime? until}) async {
     await _checkInitialization();
     until ??= DateTime.now();
@@ -138,15 +144,22 @@ class Cache<T, KeyType> {
         .toList();
   }
 
-  /// Call this method before using any [Cache] instance
+  /// Call this method before using any [Cache] instance.
   static Future<void> init() async {
     await Hive.initFlutter();
   }
 
+  /// Caches and replaces [item] when it already exists.
   Future<void> cacheAndReplace(T item) async {
     await cacheAndReplaceAll([item]);
   }
 
+  /// Caches and replaces [items] when they already exist.
+  ///
+  /// Can also be implemented with `cacheAll`:
+  /// ```dart
+  /// await cacheAll(items, replace: true);
+  /// ```
   Future<void> cacheAndReplaceAll(List<T> items) async {
     await cacheAll(items, replace: true);
   }
