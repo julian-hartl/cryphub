@@ -1,6 +1,4 @@
 import 'json_mapper.dart';
-import 'package:logger/logger.dart';
-
 import 'json_parsing_exception.dart';
 
 class CachedObject<T, KeyType> {

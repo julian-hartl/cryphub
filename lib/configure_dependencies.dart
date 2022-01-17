@@ -1,4 +1,3 @@
-import 'data/crypto_currency/crypto_currency_cache.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 

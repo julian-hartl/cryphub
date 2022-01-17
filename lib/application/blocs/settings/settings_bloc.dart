@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
-import 'package:cryphub/application/blocs/settings_notifier/settings_notifier_bloc.dart';
-import 'package:cryphub/domain/core/logger/logger.dart';
-import 'package:cryphub/domain/settings/settings.dart';
-import 'package:cryphub/domain/settings/settings_repository.dart';
+import '../settings_notifier/settings_notifier_bloc.dart';
+import '../../../domain/core/logger/logger.dart';
+import '../../../domain/settings/settings.dart';
+import '../../../domain/settings/settings_repository.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 

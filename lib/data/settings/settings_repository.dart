@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:cryphub/domain/core/logger/logger.dart';
-import 'package:cryphub/domain/settings/settings.dart';
-import 'package:cryphub/domain/settings/settings_repository.dart';
+import '../../domain/core/logger/logger.dart';
+import '../../domain/settings/settings.dart';
+import '../../domain/settings/settings_repository.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

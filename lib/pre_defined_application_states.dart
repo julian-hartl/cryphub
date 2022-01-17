@@ -1,4 +1,4 @@
-import 'package:cryphub/domain/application_directories.dart';
+import 'domain/application_directories.dart';
 import 'package:injectable/injectable.dart';
 import 'package:path_provider/path_provider.dart';
 

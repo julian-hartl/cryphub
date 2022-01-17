@@ -92,11 +92,8 @@ void main() {
     });
 
     test('getLatest error', () async {
-      const path = '/cryptocurrency/listings/latest';
       const pageSize = 20;
 
-      final errorMessage =
-          serverError(config.coinMarketCapApiUrl + path, dioAdapter);
       helpers.throwsA<ApiException>(() => sut.getLatest(1, pageSize));
     });
 
@@ -117,11 +114,6 @@ void main() {
     });
 
     test('getCurrenciesByIds error', () async {
-      const path = '/cryptocurrency/quotes/latest';
-
-      final errorMessage =
-          serverError(config.coinMarketCapApiUrl + path, dioAdapter);
-
       helpers.throwsA<ApiException>(
         () async => sut.getCryptoCurrenciesByIds(quotesLatestIds),
       );
@@ -162,10 +154,6 @@ void main() {
     });
 
     test('getCurrenciesBySymbols error', () async {
-      const path = '/cryptocurrency/quotes/latest';
-      final errorMessage =
-          serverError(config.coinMarketCapApiUrl + path, dioAdapter);
-
       helpers.throwsA<ApiException>(
         () async => sut.getCryptoCurrencyBySymbols(quotesLatestSymbols),
       );

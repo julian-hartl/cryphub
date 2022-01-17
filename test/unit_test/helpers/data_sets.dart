@@ -1,6 +1,5 @@
 // taken from https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyListingsLatest
 import 'package:cryphub/domain/crypto_currency/crypto_currency.dart';
-import 'package:cryphub/domain/crypto_currency/currency.dart';
 
 final latestDataJson = {
   "data": [

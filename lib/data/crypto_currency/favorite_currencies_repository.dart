@@ -1,9 +1,9 @@
-import 'marked_currency_as_favorite_twice_exception.dart';
-import '../../domain/core/logger/logger.dart';
-import '../../domain/crypto_currency/crypto_currency.dart';
-import '../../domain/crypto_currency/favorite_currencies_repository.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:injectable/injectable.dart';
+
+import '../../domain/core/logger/logger.dart';
+import '../../domain/crypto_currency/favorite_currencies_repository.dart';
+import 'marked_currency_as_favorite_twice_exception.dart';
 
 @LazySingleton(as: IFavoriteCurrenicesRepository)
 class FavoriteCurrenciesRepository implements IFavoriteCurrenicesRepository {

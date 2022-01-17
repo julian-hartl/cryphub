@@ -1,22 +1,17 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cryphub/application/blocs/settings/settings_bloc.dart';
-import 'package:cryphub/application/blocs/settings_notifier/settings_notifier_bloc.dart';
-import 'package:cryphub/application/screens/settings_screen/settings_screen.dart';
-import 'package:cryphub/application/widgets/expandable_sidebar.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import '../../app_router.dart';
-import '../../blocs/favorite_currencies/favorite_currencies_bloc.dart';
-import '../../blocs/favorite_currencies_notifier/favorite_currencies_notifier_bloc.dart';
-import '../../blocs/latest_currencies/latest_currencies_bloc.dart';
-import 'widgets/favorite_currencies_carousel.dart';
-import 'widgets/latest_currencies_view.dart';
 import '../../../configure_dependencies.dart';
 import '../../../domain/core/logger/logger.dart';
 import '../../../domain/crypto_currency/crypto_currency.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import '../../app_router.dart';
+import '../../blocs/latest_currencies/latest_currencies_bloc.dart';
+import '../../widgets/expandable_sidebar.dart';
+import 'widgets/favorite_currencies_carousel.dart';
+import 'widgets/latest_currencies_view.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);

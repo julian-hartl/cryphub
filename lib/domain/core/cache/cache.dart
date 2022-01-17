@@ -1,5 +1,4 @@
-import 'package:cryphub/domain/core/cache/unsupported_key_type_exception.dart';
-import 'package:flutter/foundation.dart';
+import 'package:hive_flutter/adapters.dart';
 
 import 'already_initialized_exception.dart';
 import 'cache_not_initialized_exception.dart';
@@ -7,7 +6,7 @@ import 'cached_object.dart';
 import 'duplicate_key_exception.dart';
 import 'json_mapper.dart';
 import 'key_not_found_exception.dart';
-import 'package:hive_flutter/adapters.dart';
+import 'unsupported_key_type_exception.dart';
 
 class Cache<T, KeyType> {
   final List<CachedObject<T, KeyType>> _cached = [];

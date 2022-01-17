@@ -18,7 +18,7 @@ ThemeData dark(BuildContext context) => ThemeData(
           titleTextStyle:
               _lightTextTheme.bodyText2?.copyWith(color: _darkOnBg)),
       textTheme: GoogleFonts.robotoTextTheme().copyWith(
-        bodyText2: TextStyle(color: _darkOnBg),
+        bodyText2: const TextStyle(color: _darkOnBg),
       ),
     );
 

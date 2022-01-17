@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:cryphub/application/blocs/settings/settings_bloc.dart';
-import 'package:cryphub/application/blocs/settings_notifier/settings_notifier_bloc.dart';
-import 'package:cryphub/application/widgets/alerts.dart';
-import 'package:cryphub/application/widgets/retry.dart';
-import 'package:cryphub/themes.dart';
+import '../../blocs/settings/settings_bloc.dart';
+import '../../blocs/settings_notifier/settings_notifier_bloc.dart';
+import '../../widgets/alerts.dart';
+import '../../widgets/retry.dart';
+import '../../../themes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -66,7 +66,7 @@ class SettingsScreenContent extends StatelessWidget {
                         ),
                       ),
                       const Gap(30),
-                      Text(
+                      const Text(
                         'Settings',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -94,7 +94,7 @@ class SettingsScreenContent extends StatelessWidget {
                           Row(
                             children: [
                               Container(
-                                child: Icon(Icons.brightness_2),
+                                child: const Icon(Icons.brightness_2),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: Theme.of(context).colorScheme.surface,
@@ -102,7 +102,7 @@ class SettingsScreenContent extends StatelessWidget {
                                 padding: const EdgeInsets.all(10.0),
                               ),
                               const Gap(10),
-                              Text('Dark Mode'),
+                              const Text('Dark Mode'),
                             ],
                           ),
                           OnOffSwitch(

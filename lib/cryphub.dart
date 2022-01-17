@@ -1,4 +1,4 @@
-import 'package:cryphub/application/app_router.dart';
+import 'application/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:theme_provider/theme_provider.dart';
@@ -9,7 +9,6 @@ import 'application/blocs/latest_currencies/latest_currencies_bloc.dart';
 import 'application/blocs/settings/settings_bloc.dart';
 import 'application/blocs/settings_notifier/settings_notifier_bloc.dart';
 import 'configure_dependencies.dart';
-import 'domain/settings/settings_repository.dart';
 import 'themes.dart';
 
 class Cryphub extends StatelessWidget {
@@ -52,11 +51,14 @@ class Cryphub extends StatelessWidget {
           ),
         ),
         themes: [
-          AppTheme(id: 'dark', data: dark(context), description: 'Dark theme'),
           AppTheme(
-              id: 'light', data: light(context), description: 'Light theme'),
+              id: Themes.dark, data: dark(context), description: 'Dark theme'),
+          AppTheme(
+              id: Themes.light,
+              data: light(context),
+              description: 'Light theme'),
         ],
-        defaultThemeId: 'light',
+        defaultThemeId: Themes.light,
         loadThemeOnInit: true,
         saveThemesOnChange: false,
       ),

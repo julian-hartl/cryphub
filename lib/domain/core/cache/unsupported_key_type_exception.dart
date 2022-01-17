@@ -1,4 +1,4 @@
-import 'package:cryphub/domain/core/cache/cache_exception.dart';
+import 'cache_exception.dart';
 
 class UnsupportedKeyTypeException extends CacheException {
   UnsupportedKeyTypeException(Type keyType)

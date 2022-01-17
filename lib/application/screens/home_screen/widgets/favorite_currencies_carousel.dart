@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:cryphub/configure_dependencies.dart';
-import 'package:cryphub/data/utils/dominant_color_finder.dart';
+import '../../../../configure_dependencies.dart';
+import '../../../../data/utils/dominant_color_finder.dart';
 import 'package:gap/gap.dart';
 import 'package:kt_dart/collection.dart';
 import '../../../blocs/favorite_currencies/favorite_currencies_bloc.dart';

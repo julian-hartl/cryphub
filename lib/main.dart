@@ -1,10 +1,7 @@
-import 'package:cryphub/domain/core/cache/cache.dart';
-
-import 'configure_dependencies.dart';
-import 'cryphub.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:get_storage/get_storage.dart';
+
+import 'cryphub.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
