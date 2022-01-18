@@ -7,7 +7,6 @@ import 'package:cryphub/data/utils/converters.dart';
 import 'package:cryphub/domain/application_directories.dart';
 import 'package:cryphub/domain/core/api_exception.dart';
 import 'package:cryphub/domain/core/cache/cache.dart';
-import 'package:cryphub/domain/core/logger/logger.dart';
 import 'package:cryphub/domain/network/network_response.dart';
 import 'package:cryphub/domain/network/network_service.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -130,6 +129,11 @@ void main() {
     });
 
     test('getCurrenciesByIds error', () async {
+      when(networkService.get(
+        any,
+        headers: anyNamed('headers'),
+        queryParameters: anyNamed('queryParameters'),
+      )).thenThrow(ApiException(''));
       helpers.throwsA<ApiException>(
         () async => sut.getCryptoCurrenciesByIds(quotesLatestIds),
       );
@@ -174,13 +178,18 @@ void main() {
     });
 
     test('getCurrenciesBySymbols error', () async {
+      when(networkService.get(
+        any,
+        headers: anyNamed('headers'),
+        queryParameters: anyNamed('queryParameters'),
+      )).thenThrow(ApiException(''));
       helpers.throwsA<ApiException>(
         () async => sut.getCryptoCurrencyBySymbols(quotesLatestSymbols),
       );
     });
 
     test('getLatest should cache the returned data', () async {
-      final url = kCoinMarketCapApiUrl + '/cryptocurrency/listings/latest';
+      const url = kCoinMarketCapApiUrl + '/cryptocurrency/listings/latest';
 
       final data = latestDataJson;
       final cryptoCurrencies = latestCurrencies;

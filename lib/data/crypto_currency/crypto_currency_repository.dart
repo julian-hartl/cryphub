@@ -90,16 +90,17 @@ class CryptoCurrencyRepository
     try {
       final cachedCryptoCurrencies = await cryptoCurrencyCache
           .getInTimespan(DateTime.now().subtract(const Duration(minutes: 10)));
-      final modifiableSymbols = List<String>.from(symbols, growable: true);
+      final notCachedCryptoCurrencies =
+          List<String>.from(symbols, growable: true);
       final cachedCryptoCurrenciesWithSymbols = [];
 
       for (var element in cachedCryptoCurrencies) {
-        modifiableSymbols.remove(element.symbol);
+        notCachedCryptoCurrencies.remove(element.symbol);
         if (symbols.contains(element.symbol)) {
           cachedCryptoCurrenciesWithSymbols.add(element);
         }
       }
-      symbols = modifiableSymbols;
+      symbols = notCachedCryptoCurrencies;
       final cryptoCurrenciesFromApi =
           await getCryptoCurrenciesBy(symbols, 'symbol');
       cryptoCurrencyCache.cacheAndReplaceAll(cryptoCurrenciesFromApi);
