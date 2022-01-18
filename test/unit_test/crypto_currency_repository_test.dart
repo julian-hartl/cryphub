@@ -46,7 +46,6 @@ void main() {
       );
       sut = CryptoCurrencyRepository(
         cryptoCurrencyCache,
-        Logger(),
         app.get<ApplicationDirectories>(),
         networkService,
       );

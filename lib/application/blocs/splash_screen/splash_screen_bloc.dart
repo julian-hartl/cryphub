@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
+import 'package:cryphub/data/logger/logger_provider.dart';
 import 'package:cryphub/domain/connectivity/connectivity_service.dart';
 import 'package:cryphub/domain/core/cache/cache.dart';
-import 'package:cryphub/domain/core/logger/logger.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:injectable/injectable.dart';
@@ -11,13 +11,12 @@ part 'splash_screen_state.dart';
 part 'splash_screen_bloc.freezed.dart';
 
 @lazySingleton
-class SplashScreenBloc extends Bloc<SplashScreenEvent, SplashScreenState> {
+class SplashScreenBloc extends Bloc<SplashScreenEvent, SplashScreenState>
+    with LoggerProvider {
   final IConnectivityService connectivityService;
-  final Logger logger;
 
   SplashScreenBloc(
     this.connectivityService,
-    this.logger,
   ) : super(const SplashScreenState.initial()) {
     on<_Initialize>((event, emit) async {
       try {
@@ -31,8 +30,8 @@ class SplashScreenBloc extends Bloc<SplashScreenEvent, SplashScreenState> {
         } else {
           emit(const SplashScreenState.initializationSuccess());
         }
-      } catch (e) {
-        logger.error(e);
+      } catch (e, st) {
+        logger.error('', e, st);
         emit(const SplashScreenState.errorOccurred());
       }
     });

@@ -1,25 +1,23 @@
 import 'package:bloc/bloc.dart';
-import '../settings_notifier/settings_notifier_bloc.dart';
-import '../../../domain/core/logger/logger.dart';
-import '../../../domain/settings/settings.dart';
-import '../../../domain/settings/settings_repository.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../domain/settings/settings.dart';
+import '../../../domain/settings/settings_repository.dart';
+import '../settings_notifier/settings_notifier_bloc.dart';
+
+part 'settings_bloc.freezed.dart';
 part 'settings_event.dart';
 part 'settings_state.dart';
-part 'settings_bloc.freezed.dart';
 
 @lazySingleton
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final ISettingsRepository settingsRepository;
   final SettingsNotifierBloc settingsNotifierBloc;
-  final Logger logger;
 
   SettingsBloc(
     this.settingsRepository,
     this.settingsNotifierBloc,
-    this.logger,
   ) : super(const SettingsState.loadingSettings()) {
     on<_ToggleDarkMode>((event, emit) async {
       try {

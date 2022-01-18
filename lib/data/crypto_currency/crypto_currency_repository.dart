@@ -1,4 +1,5 @@
 import 'package:cryphub/core/constants.dart';
+import 'package:cryphub/data/logger/logger_provider.dart';
 import 'package:cryphub/domain/network/network_response.dart';
 import 'package:cryphub/domain/network/network_service.dart';
 import 'package:injectable/injectable.dart';
@@ -6,22 +7,21 @@ import 'package:injectable/injectable.dart';
 import '../../core/config.dart';
 import '../../domain/application_directories.dart';
 import '../../domain/core/api_exception.dart';
-import '../../domain/core/logger/logger.dart';
 import '../../domain/crypto_currency/crypto_currency.dart';
 import '../../domain/crypto_currency/crypto_currency_repository.dart';
 import '../utils/converters.dart';
 import 'crypto_currency_cache.dart';
 
 @LazySingleton(as: ICryptoCurrencyRepository)
-class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
+class CryptoCurrencyRepository
+    with LoggerProvider
+    implements ICryptoCurrencyRepository {
   final CryptoCurrencyCache cryptoCurrencyCache;
-  final Logger logger;
   final ApplicationDirectories applicationDirectories;
   final INetworkService networkService;
 
   CryptoCurrencyRepository(
     this.cryptoCurrencyCache,
-    this.logger,
     this.applicationDirectories,
     this.networkService,
   ) {
@@ -52,8 +52,8 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
           data.map((json) => cryptoCurrencyFromApiReponse(json)).toList();
       await cryptoCurrencyCache.cacheAndReplaceAll(latest);
       return latest;
-    } catch (e) {
-      logger.error(e);
+    } catch (e, st) {
+      logger.error('', e, st);
       throw ApiException(e.toString());
     }
   }

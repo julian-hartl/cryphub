@@ -1,30 +1,30 @@
 import 'package:bloc/bloc.dart';
-import '../../../domain/core/logger/logger.dart';
-import '../favorite_currencies_notifier/favorite_currencies_notifier_bloc.dart';
-import '../../../domain/crypto_currency/crypto_currency.dart';
-import '../../../domain/crypto_currency/crypto_currency_repository.dart';
-import '../../../domain/crypto_currency/favorite_currencies_repository.dart';
+import 'package:cryphub/data/logger/logger_provider.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:kt_dart/collection.dart';
 
+import '../../../domain/crypto_currency/crypto_currency.dart';
+import '../../../domain/crypto_currency/crypto_currency_repository.dart';
+import '../../../domain/crypto_currency/favorite_currencies_repository.dart';
+import '../favorite_currencies_notifier/favorite_currencies_notifier_bloc.dart';
+
+part 'favorite_currencies_bloc.freezed.dart';
 part 'favorite_currencies_event.dart';
 part 'favorite_currencies_state.dart';
-part 'favorite_currencies_bloc.freezed.dart';
 
 @lazySingleton
 class FavoriteCurrenciesBloc
-    extends Bloc<FavoriteCurrenciesEvent, FavoriteCurrenciesState> {
+    extends Bloc<FavoriteCurrenciesEvent, FavoriteCurrenciesState>
+    with LoggerProvider {
   final IFavoriteCurrenicesRepository favoriteCurrenciesRepository;
   final ICryptoCurrencyRepository cryptoCurrencyRepository;
   final FavoriteCurrenciesNotifierBloc favoriteCurrenciesNotifier;
-  final Logger logger;
 
   FavoriteCurrenciesBloc(
     this.favoriteCurrenciesRepository,
     this.cryptoCurrencyRepository,
     this.favoriteCurrenciesNotifier,
-    this.logger,
   ) : super(const FavoriteCurrenciesState.updating()) {
     on<_LoadFavorites>((event, emit) async {
       try {
@@ -37,8 +37,8 @@ class FavoriteCurrenciesBloc
         }
 
         emit(FavoriteCurrenciesState.updatedFavorites(KtList.from(favorites)));
-      } catch (e) {
-        logger.error(e);
+      } catch (e, st) {
+        logger.error('', e, st);
 
         emit(const FavoriteCurrenciesState.error('Api exception occurred.'));
       }
@@ -79,8 +79,8 @@ class FavoriteCurrenciesBloc
         final favorites = await _getCurrentFavorites();
         emit(FavoriteCurrenciesState.updatedFavorites(
             favorites.toImmutableList()));
-      } catch (e) {
-        logger.warning(e);
+      } catch (e, st) {
+        logger.error('', e, st);
 
         emit(FavoriteCurrenciesState.updatedFavorites(
             (await _getCurrentFavorites()).toImmutableList()));

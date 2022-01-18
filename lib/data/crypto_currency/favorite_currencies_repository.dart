@@ -1,16 +1,16 @@
+import 'package:cryphub/data/logger/logger_provider.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../domain/core/logger/logger.dart';
 import '../../domain/crypto_currency/favorite_currencies_repository.dart';
 import 'marked_currency_as_favorite_twice_exception.dart';
 
 @LazySingleton(as: IFavoriteCurrenicesRepository)
-class FavoriteCurrenciesRepository implements IFavoriteCurrenicesRepository {
+class FavoriteCurrenciesRepository
+    with LoggerProvider
+    implements IFavoriteCurrenicesRepository {
   late final GetStorage storage;
-  final Logger logger;
-
-  FavoriteCurrenciesRepository(this.storage, this.logger);
+  FavoriteCurrenciesRepository(this.storage);
 
   List<String>? _favoritesSymbols;
 
@@ -21,6 +21,7 @@ class FavoriteCurrenciesRepository implements IFavoriteCurrenicesRepository {
     return _favoritesSymbols!;
   }
 
+  /// Reads favorites from [GetStorage]
   Future<void> _initFavoritesSymbols() async {
     try {
       await storage.initStorage;
@@ -28,8 +29,8 @@ class FavoriteCurrenciesRepository implements IFavoriteCurrenicesRepository {
 
       _favoritesSymbols ??=
           List<String>.from(favorites?.cast<String>() ?? [], growable: true);
-    } catch (e) {
-      logger.error(e.toString());
+    } catch (e, st) {
+      logger.error('', e, st);
       rethrow;
     }
   }
@@ -45,9 +46,8 @@ class FavoriteCurrenciesRepository implements IFavoriteCurrenicesRepository {
       }
       _favoritesSymbols!.add(symbol);
       await storage.write('favorites', _favoritesSymbols);
-    } catch (e) {
-      logger.error(e.toString());
-
+    } catch (e, st) {
+      logger.error('', e, st);
       rethrow;
     }
   }
@@ -57,9 +57,8 @@ class FavoriteCurrenciesRepository implements IFavoriteCurrenicesRepository {
     try {
       _favoritesSymbols?.remove(symbol);
       await storage.write('favorites', _favoritesSymbols);
-    } catch (e) {
-      logger.error(e.toString());
-
+    } catch (e, st) {
+      logger.error('', e, st);
       rethrow;
     }
   }
