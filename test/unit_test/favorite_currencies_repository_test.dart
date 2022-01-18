@@ -1,6 +1,5 @@
 import 'package:cryphub/data/crypto_currency/favorite_currencies_repository.dart';
 import 'package:cryphub/data/crypto_currency/marked_currency_as_favorite_twice_exception.dart';
-import 'package:cryphub/domain/core/logger/logger.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -16,7 +15,7 @@ void main() {
     });
     setUp(() {
       storage = GetStorage('test-container');
-      sut = FavoriteCurrenciesRepository(storage, Logger());
+      sut = FavoriteCurrenciesRepository(storage);
     });
     tearDown(() async {
       await storage.erase();
@@ -29,7 +28,7 @@ void main() {
       expect(mFavorites, equals([currency.symbol]));
 
       // in storage test
-      sut = FavoriteCurrenciesRepository(storage, Logger());
+      sut = FavoriteCurrenciesRepository(storage);
       final sFavorites = await sut.getFavorites();
       expect(sFavorites, equals([currency.symbol]));
     });

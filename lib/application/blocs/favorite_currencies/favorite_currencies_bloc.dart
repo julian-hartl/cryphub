@@ -40,7 +40,7 @@ class FavoriteCurrenciesBloc
       } catch (e, st) {
         logger.error('', e, st);
 
-        emit(const FavoriteCurrenciesState.error('Api exception occurred.'));
+        emit(const FavoriteCurrenciesState.error('Could not load favorites.'));
       }
     });
     on<_MarkAsFavorite>((event, emit) async {

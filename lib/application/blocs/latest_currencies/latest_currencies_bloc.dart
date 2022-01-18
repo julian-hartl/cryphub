@@ -33,7 +33,8 @@ class LatestCurrenciesBloc
       } catch (e, st) {
         logger.error('', e, st);
 
-        emit(const LatestCurrenciesState.error('Api exception occurred.'));
+        emit(const LatestCurrenciesState.error(
+            'Could not get latest currencies.'));
       }
     });
   }
