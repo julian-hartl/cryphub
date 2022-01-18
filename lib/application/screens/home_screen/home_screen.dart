@@ -100,6 +100,7 @@ class _HomeScreenContentState extends State<HomeScreenContent>
                   ),
                 ),
               ),
+
               SliverPadding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: kHorizontalPagePadding),
@@ -107,6 +108,8 @@ class _HomeScreenContentState extends State<HomeScreenContent>
                   pagingController: pagingController,
                 ),
               ),
+
+
             ],
           ),
         ),

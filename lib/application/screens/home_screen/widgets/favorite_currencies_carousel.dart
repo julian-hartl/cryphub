@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cryphub/application/ui_constants.dart';
 import 'package:cryphub/application/widgets/shimmer_effect.dart';
 import 'package:cryphub/core/app.dart';
+import 'package:cryphub/data/logger/logger_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -160,7 +162,7 @@ class FavoriteCurrencyCard extends StatefulWidget {
   State<FavoriteCurrencyCard> createState() => _FavoriteCurrencyCardState();
 }
 
-class _FavoriteCurrencyCardState extends State<FavoriteCurrencyCard> {
+class _FavoriteCurrencyCardState extends State<FavoriteCurrencyCard> with LoggerProvider{
   Future<void> computeOnDominantColor() async {
     if (computedOnDominantColor != null) return;
     computedOnDominantColor =
@@ -174,39 +176,58 @@ class _FavoriteCurrencyCardState extends State<FavoriteCurrencyCard> {
 
   Future<Color>? computedDominantColor;
 
-  String? lastUsedIconUrl;
+  @override
+  void didUpdateWidget(covariant FavoriteCurrencyCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if(oldWidget.favorite.iconUrl != widget.favorite.iconUrl){
+      computeColors();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+
+    super.didChangeDependencies();
+    computeColors();
+  }
+
+  void computeColors(){
+    try {
+      app
+          .get<DominantColorFinder>()
+          .find(CachedNetworkImageProvider(widget.favorite.iconUrl))
+          .then((value) {
+
+        setState(() {
+          computedDominantColor = Future.value(value);
+        });
+        computeOnDominantColor();
+      }).catchError((_) {
+        setState(() {
+          computedDominantColor =
+              Future.value(Theme.of(context).colorScheme.primary);
+        });
+      });
+    } catch (_) {}
+  }
+
+  static const cardBorderRadius = 10.0;
+
 
   @override
   Widget build(BuildContext context) {
-    try {
-      if (lastUsedIconUrl != widget.favorite.iconUrl) {
-        app
-            .get<DominantColorFinder>()
-            .find(CachedNetworkImageProvider(widget.favorite.iconUrl))
-            .then((value) {
-          lastUsedIconUrl = widget.favorite.iconUrl;
-          setState(() {
-            computedDominantColor = Future.value(value);
-          });
-          // computeOnDominantColor();
-        }).catchError((_) {
-          setState(() {
-            computedDominantColor =
-                Future.value(Theme.of(context).colorScheme.primary);
-          });
-        });
-      }
-    } catch (_) {}
+
     return FutureBuilder<Color>(
         future: computedDominantColor,
         builder: (context, snapshot) {
           final dominantColor = snapshot.data;
+          logger.info(dominantColor);
           final onDominantColor = computedOnDominantColor;
           if (dominantColor == null || onDominantColor == null) {
             return ShimmerEffect(
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
+                  borderRadius: BorderRadius.circular(cardBorderRadius),
                   color: Theme.of(context).colorScheme.surface,
                 ),
               ),
@@ -216,9 +237,9 @@ class _FavoriteCurrencyCardState extends State<FavoriteCurrencyCard> {
           }
           return Container(
             padding:
-                const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
+                const EdgeInsets.symmetric(horizontal: kHorizontalPagePadding, vertical: 10.0),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10.0),
+              borderRadius: BorderRadius.circular(cardBorderRadius),
               color: dominantColor,
             ),
             child: Column(

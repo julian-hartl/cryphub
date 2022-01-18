@@ -62,6 +62,7 @@ class LatestCurrenciesView extends StatelessWidget with LoggerProvider {
             return favoritesState.when(
               updatedFavorites: (favorites) {
                 return PagedSliverList<int, CryptoCurrency>(
+
                   builderDelegate: PagedChildBuilderDelegate<CryptoCurrency>(
                     itemBuilder: (context, item, index) => CurrencyCard(
                       cryptoCurrency: item,
@@ -71,7 +72,7 @@ class LatestCurrenciesView extends StatelessWidget with LoggerProvider {
                           .toList()
                           .contains(item.symbol),
                     ),
-                    animateTransitions: true,
+                    // animateTransitions: true,
                     firstPageErrorIndicatorBuilder: (context) =>
                         _buildErrorIndicator(),
                     newPageErrorIndicatorBuilder: (context) =>
@@ -85,6 +86,7 @@ class LatestCurrenciesView extends StatelessWidget with LoggerProvider {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Text('No currencies found...'),
+                        const Gap(5),
                         ElevatedButton(
                             onPressed: () {
                               pagingController.refresh();
@@ -174,12 +176,14 @@ class CurrencyCard extends StatelessWidget {
             CircleAvatar(
               radius: 25.0,
               // https://stackoverflow.com/questions/53577962/better-way-to-load-images-from-network-flutter
-              child: CachedNetworkImage(
+              child: /*CachedNetworkImage(
                 imageUrl: cryptoCurrency.iconUrl,
                 placeholder: (context, url) => const Center(
                   child: CircularProgressIndicator(),
                 ),
               ),
+              */
+              Image.network(cryptoCurrency.iconUrl),
             ),
             const Gap(10),
             Expanded(

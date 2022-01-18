@@ -221,9 +221,8 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
           AnimatedBuilder(
             builder: (BuildContext context, Widget? child) {
               return Transform.translate(
-                offset: sidebarTranslateAnimation.value,
-                child: Transform.translate(
-                    offset: sidebarSlideUpAnimation.value, child: child),
+                offset: Offset(sidebarTranslateAnimation.value.dx, sidebarSlideUpAnimation.value.dy + sidebarTranslateAnimation.value.dy),
+                child: child,
               );
             },
             animation: sidebarAnimationController,
@@ -262,8 +261,10 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
                 )
                   ..rotateZ(angle)
                   ..scale(childScaleAnimation.value),
-                child: ClipRRect(
-                  borderRadius: childBorderRadiusAnimation.value,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: childBorderRadiusAnimation.value,
+                  ),
                   child: child,
                 ),
               );
