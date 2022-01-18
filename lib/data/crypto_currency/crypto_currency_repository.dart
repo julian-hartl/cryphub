@@ -58,35 +58,6 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
     }
   }
 
-  /// Checks wether the request was successful or not.
-  ///
-  /// Throws an [ApiException] when it was not successful.
-  ///
-  /// Does nothing when it was successful.
-  void checkResponse(NetworkResponse response) {
-    if (response.status > 299) {
-      throw ApiException(
-          errorMessageFromApiError(response.data) ?? 'Unknown error.');
-    }
-  }
-
-  /// To see format in which the data is returned from the api, visit: https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyListingsHistorical
-  CryptoCurrency cryptoCurrencyFromApiReponse(Map<String, dynamic> json) {
-    final id = json['id'];
-    return CryptoCurrency(
-      currentPrice: json['quote']['USD']['price'],
-      percentChange1h: json['quote']['USD']['percent_change_1h'],
-      percentChange24h: json['quote']['USD']['percent_change_24h'],
-      percentChange7d: json['quote']['USD']['percent_change_7d'],
-      symbol: json['symbol'],
-      iconUrl: 'https://s2.coinmarketcap.com/static/img/coins/64x64/$id.png',
-      name: json['name'],
-      currency: Currency.usd,
-      priceLastUpdated: DateTime.parse(json['quote']['USD']['last_updated']),
-      id: id,
-    );
-  }
-
   @override
   Future<List<CryptoCurrency>> getCryptoCurrenciesByIds(List<int> ids) async {
     try {
@@ -173,6 +144,35 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
       kCoinMarketCapApiUrl + path,
       headers: {'X-CMC_PRO_API_KEY': config.coinMarketCapApiKey},
       queryParameters: queryParameters,
+    );
+  }
+
+  /// Checks wether the request was successful or not.
+  ///
+  /// Throws an [ApiException] when it was not successful.
+  ///
+  /// Does nothing when it was successful.
+  void checkResponse(NetworkResponse response) {
+    if (response.status > 299) {
+      throw ApiException(
+          errorMessageFromApiError(response.data) ?? 'Unknown error.');
+    }
+  }
+
+  /// To see format in which the data is returned from the api, visit: https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyListingsHistorical
+  CryptoCurrency cryptoCurrencyFromApiReponse(Map<String, dynamic> json) {
+    final id = json['id'];
+    return CryptoCurrency(
+      currentPrice: json['quote']['USD']['price'],
+      percentChange1h: json['quote']['USD']['percent_change_1h'],
+      percentChange24h: json['quote']['USD']['percent_change_24h'],
+      percentChange7d: json['quote']['USD']['percent_change_7d'],
+      symbol: json['symbol'],
+      iconUrl: 'https://s2.coinmarketcap.com/static/img/coins/64x64/$id.png',
+      name: json['name'],
+      currency: Currency.usd,
+      priceLastUpdated: DateTime.parse(json['quote']['USD']['last_updated']),
+      id: id,
     );
   }
 
