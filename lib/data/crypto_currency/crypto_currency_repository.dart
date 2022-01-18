@@ -14,18 +14,11 @@ import 'crypto_currency_cache.dart';
 
 @LazySingleton(as: ICryptoCurrencyRepository)
 class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
-  late final CryptoCurrencyCache cryptoCurrencyCache;
+  final CryptoCurrencyCache cryptoCurrencyCache;
   final Logger logger;
   final ApplicationDirectories applicationDirectories;
   final INetworkService networkService;
 
-  // late final _options = CacheOptions(
-  //   store: HiveCacheStore(
-  //     applicationDirectories.docDir,
-  //     hiveBoxName: 'crypto_currencies_request_storage',
-  //   ),
-  //   maxStale: const Duration(minutes: 15),
-  // );
   CryptoCurrencyRepository(
     this.cryptoCurrencyCache,
     this.logger,
@@ -35,24 +28,28 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
     // dio.interceptors.add(DioCacheInterceptor(options: _options));
   }
 
-  /// first page is page = 1
+  /// Specifies how long an item can live in the cache before being invalid
+  static const cacheRefreshInterval = Duration(minutes: 10);
+
   @override
   Future<List<CryptoCurrency>> getLatest(int page, int pageSize) async {
     try {
-      // await Future.delayed(const Duration(seconds: 1));
-
-      // return fakeCryptoCurrencies(pageSize);
+      /// Makes a get request to https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest
       final response = await getFromCurrencyApi(
           '/cryptocurrency/listings/latest',
           queryParameters: {
+            /// Specifies how many items are returned
             'limit': pageSize,
+
+            /// Start is index from where items start to be returned
+            /// For example, when a list like `["Hello", "World"]` is present in the databas and `start` is 2,
+            /// it will return ["World"]
             'start': (page - 1) * pageSize + 1,
           });
       checkResponse(response);
       final data = response.data['data'] as List;
-      final latest = data
-          .map((json) => cryptoCurrencyFromApiListingsLatest(json))
-          .toList();
+      final latest =
+          data.map((json) => cryptoCurrencyFromApiReponse(json)).toList();
       await cryptoCurrencyCache.cacheAndReplaceAll(latest);
       return latest;
     } catch (e) {
@@ -61,6 +58,11 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
     }
   }
 
+  /// Checks wether the request was successful or not.
+  ///
+  /// Throws an [ApiException] when it was not successful.
+  ///
+  /// Does nothing when it was successful.
   void checkResponse(NetworkResponse response) {
     if (response.status > 299) {
       throw ApiException(
@@ -69,8 +71,7 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
   }
 
   /// To see format in which the data is returned from the api, visit: https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyListingsHistorical
-  CryptoCurrency cryptoCurrencyFromApiListingsLatest(
-      Map<String, dynamic> json) {
+  CryptoCurrency cryptoCurrencyFromApiReponse(Map<String, dynamic> json) {
     final id = json['id'];
     return CryptoCurrency(
       currentPrice: json['quote']['USD']['price'],
@@ -90,21 +91,24 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
   Future<List<CryptoCurrency>> getCryptoCurrenciesByIds(List<int> ids) async {
     try {
       final cachedCryptoCurrencies = await cryptoCurrencyCache
-          .getInTimespan(DateTime.now().subtract(const Duration(minutes: 10)));
-      final modifiableIds = List<int>.from(ids, growable: true);
+          .getInTimespan(DateTime.now().subtract(cacheRefreshInterval));
+      // Makes list modifiable
+      final notCachedCurrenciesIds = List<int>.from(ids, growable: true);
+      // Stores all already cached items
       final cachedCryptoCurrenciesWithIds = [];
       for (var element in cachedCryptoCurrencies) {
-        modifiableIds.remove(element.id);
+        notCachedCurrenciesIds.remove(element.id);
         if (ids.contains(element.id)) {
           cachedCryptoCurrenciesWithIds.add(element);
         }
       }
-      ids = modifiableIds;
+      ids = notCachedCurrenciesIds;
 
       final cryptoCurrenciesFromApi = await getCryptoCurrenciesBy(ids, "id");
       cryptoCurrencyCache.cacheAndReplaceAll(cryptoCurrenciesFromApi);
       return [...cachedCryptoCurrenciesWithIds, ...cryptoCurrenciesFromApi];
-    } catch (e) {
+    } catch (e, st) {
+      logger.error('', e, st);
       rethrow;
     }
   }
@@ -112,49 +116,55 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
   @override
   Future<List<CryptoCurrency>> getCryptoCurrencyBySymbols(
       List<String> symbols) async {
-    final cachedCryptoCurrencies = await cryptoCurrencyCache
-        .getInTimespan(DateTime.now().subtract(const Duration(minutes: 10)));
-    final modifiableSymbols = List<String>.from(symbols, growable: true);
-    final cachedCryptoCurrenciesWithSymbols = [];
-
-    for (var element in cachedCryptoCurrencies) {
-      modifiableSymbols.remove(element.symbol);
-      if (symbols.contains(element.symbol)) {
-        cachedCryptoCurrenciesWithSymbols.add(element);
-      }
-    }
-    symbols = modifiableSymbols;
-    final cryptoCurrenciesFromApi =
-        await getCryptoCurrenciesBy(symbols, 'symbol');
-    cryptoCurrencyCache.cacheAndReplaceAll(cryptoCurrenciesFromApi);
-    return [...cachedCryptoCurrenciesWithSymbols, ...cryptoCurrenciesFromApi];
-  }
-
-  /// [what] indicates which query paramter should be used to query crypto currencies
-  Future<List<CryptoCurrency>> getCryptoCurrenciesBy(
-      List l, String what) async {
     try {
-      if (l.isEmpty) {
-        return List.empty();
-      } // https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyQuotesLatest
-      final commaSeperated = seperateListValues(l);
-      final response = await getFromCurrencyApi(
-        '/cryptocurrency/quotes/latest',
-        queryParameters: {what: commaSeperated},
-      );
-      checkResponse(response);
+      final cachedCryptoCurrencies = await cryptoCurrencyCache
+          .getInTimespan(DateTime.now().subtract(const Duration(minutes: 10)));
+      final modifiableSymbols = List<String>.from(symbols, growable: true);
+      final cachedCryptoCurrenciesWithSymbols = [];
 
-      final data = response.data['data'] as Map<String, dynamic>;
-      final currencies = data.entries
-          .map((entry) => cryptoCurrencyFromApiListingsLatest(entry.value))
-          .toList();
-      return currencies;
-    } catch (e) {
-      logger.error(e.toString());
-      throw ApiException(e.toString());
+      for (var element in cachedCryptoCurrencies) {
+        modifiableSymbols.remove(element.symbol);
+        if (symbols.contains(element.symbol)) {
+          cachedCryptoCurrenciesWithSymbols.add(element);
+        }
+      }
+      symbols = modifiableSymbols;
+      final cryptoCurrenciesFromApi =
+          await getCryptoCurrenciesBy(symbols, 'symbol');
+      cryptoCurrencyCache.cacheAndReplaceAll(cryptoCurrenciesFromApi);
+      return [...cachedCryptoCurrenciesWithSymbols, ...cryptoCurrenciesFromApi];
+    } catch (e, st) {
+      logger.error('', e, st);
+      rethrow;
     }
   }
 
+  /// [cryptoCurrenciesQueryParamter] indicates which query paramter should be used to query crypto currencies.
+  ///
+  /// Does not catch exceptions.
+  ///
+  /// See https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyQuotesLatest .
+  Future<List<CryptoCurrency>> getCryptoCurrenciesBy(
+      List cryptoCurrenciesIdentifieres,
+      String cryptoCurrenciesQueryParamter) async {
+    if (cryptoCurrenciesIdentifieres.isEmpty) {
+      return List.empty();
+    }
+    final commaSeperated = seperateListValues(cryptoCurrenciesIdentifieres);
+    final response = await getFromCurrencyApi(
+      '/cryptocurrency/quotes/latest',
+      queryParameters: {cryptoCurrenciesQueryParamter: commaSeperated},
+    );
+    checkResponse(response);
+
+    final data = response.data['data'] as Map<String, dynamic>;
+    final currencies = data.entries
+        .map((entry) => cryptoCurrencyFromApiReponse(entry.value))
+        .toList();
+    return currencies;
+  }
+
+  /// Makes a get request to [kCoinMarketCapApiUrl] + [path]
   Future<NetworkResponse> getFromCurrencyApi(
     String path, {
     Map<String, dynamic>? queryParameters,
@@ -166,12 +176,9 @@ class CryptoCurrencyRepository implements ICryptoCurrencyRepository {
     );
   }
 
+  /// Returns the error messsage from returned [data]
   String? errorMessageFromApiError(dynamic data) {
     final String? errorMessage = data['status']['error_message'];
     return errorMessage;
   }
-
-  // final Cache<CryptoCurrency> cryptoCurrencyCache = Cache();
-
-  // void cacheCurrency(CryptoCurrency cryptoCurrency) {}
 }
