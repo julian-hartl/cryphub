@@ -7,7 +7,7 @@ import 'package:cryphub/application/blocs/splash_screen/splash_screen_bloc.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'configure_dependencies.dart';
+import 'app.dart';
 
 class GlobalProvider extends StatelessWidget {
   const GlobalProvider({Key? key, required this.child}) : super(key: key);

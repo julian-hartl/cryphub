@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cryphub/core/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:kt_dart/collection.dart';
 
-import '../../../../core/configure_dependencies.dart';
 import '../../../../data/utils/converters.dart';
 import '../../../../data/utils/dominant_color_finder.dart';
 import '../../../../domain/crypto_currency/crypto_currency.dart';

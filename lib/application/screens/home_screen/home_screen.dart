@@ -8,6 +8,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import '../../../domain/crypto_currency/crypto_currency.dart';
 import '../../app_router.dart';
 import '../../blocs/latest_currencies/latest_currencies_bloc.dart';
+import '../../ui_constants.dart';
 import '../../widgets/expandable_sidebar.dart';
 import 'widgets/favorite_currencies_carousel.dart';
 import 'widgets/latest_currencies_view.dart';
@@ -74,6 +75,7 @@ class _HomeScreenContentState extends State<HomeScreenContent>
               SliverAppBar(
                 title: Text(
                   'Home'.toUpperCase(),
+                  style: const TextStyle(letterSpacing: 1.3),
                 ),
                 leading: IconButton(
                   onPressed: () {
@@ -88,8 +90,8 @@ class _HomeScreenContentState extends State<HomeScreenContent>
                 sliver: FavoriteCurrenciesCarousel(),
               ),
               SliverPadding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: kHorizontalPagePadding, vertical: 8.0),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate(
                     [
@@ -99,7 +101,8 @@ class _HomeScreenContentState extends State<HomeScreenContent>
                 ),
               ),
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: kHorizontalPagePadding),
                 sliver: LatestCurrenciesView(
                   pagingController: pagingController,
                 ),
@@ -123,7 +126,7 @@ class HomeScreenSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(kHorizontalPagePadding),
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

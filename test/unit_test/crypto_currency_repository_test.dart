@@ -1,3 +1,4 @@
+import 'package:cryphub/core/app.dart';
 import 'package:cryphub/core/config.dart';
 import 'package:cryphub/core/configure_dependencies.dart';
 import 'package:cryphub/core/constants.dart';
@@ -56,7 +57,7 @@ void main() {
       const path = '/api';
       const status = 200;
       final mockData = {'mock': 12};
-      final url = kCoinMarketCapApiUrl + path;
+      const url = kCoinMarketCapApiUrl + path;
       final queryParameters = {'parameter': 1};
       when(networkService.get(
         url,

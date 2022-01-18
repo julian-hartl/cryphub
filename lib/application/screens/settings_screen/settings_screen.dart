@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cryphub/application/ui_constants.dart';
 import '../../blocs/settings/settings_bloc.dart';
 import '../../blocs/settings_notifier/settings_notifier_bloc.dart';
 import '../../widgets/alerts.dart';
@@ -52,7 +53,7 @@ class SettingsScreenContent extends StatelessWidget {
             loadedSettings: (settings) {
               return SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(kHorizontalPagePadding),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

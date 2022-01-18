@@ -3,7 +3,7 @@ import 'package:cryphub/domain/settings/settings_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:theme_provider/theme_provider.dart';
 
-import 'configure_dependencies.dart';
+import 'app.dart';
 
 class ThemeManager extends StatelessWidget {
   const ThemeManager({
