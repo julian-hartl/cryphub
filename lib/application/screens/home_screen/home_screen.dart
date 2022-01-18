@@ -1,11 +1,10 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:cryphub/data/logger/logger_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import '../../../core/configure_dependencies.dart';
-import '../../../domain/core/logger/logger.dart';
 import '../../../domain/crypto_currency/crypto_currency.dart';
 import '../../app_router.dart';
 import '../../blocs/latest_currencies/latest_currencies_bloc.dart';
@@ -30,14 +29,15 @@ class HomeScreenContent extends StatefulWidget {
   State<HomeScreenContent> createState() => _HomeScreenContentState();
 }
 
-class _HomeScreenContentState extends State<HomeScreenContent> {
+class _HomeScreenContentState extends State<HomeScreenContent>
+    with LoggerProvider {
   final PagingController<int, CryptoCurrency> pagingController =
       PagingController(firstPageKey: 0, invisibleItemsThreshold: 4);
 
   @override
   void initState() {
     pagingController.addPageRequestListener((pageKey) {
-      app.get<Logger>().info('Requesting new items from api. Page $pageKey');
+      logger.info('Requesting new items from api. Page $pageKey');
       context
           .read<LatestCurrenciesBloc>()
           .add(LatestCurrenciesEvent.loadPage(pageKey));

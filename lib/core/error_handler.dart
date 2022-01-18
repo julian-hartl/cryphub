@@ -1,16 +1,12 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:cryphub/application/screens/error_screen/error_screen.dart';
-import 'package:cryphub/core/cryphub.dart';
-import 'package:cryphub/domain/core/logger/logger.dart';
+import 'package:cryphub/data/logger/logger_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'configure_dependencies.dart';
-
-class ErrorHandler {
+class ErrorHandler with LoggerProvider {
   ErrorHandler({required Widget child}) {
     runZonedGuarded(() async {
       if (kReleaseMode) {
@@ -18,7 +14,6 @@ class ErrorHandler {
               details: details,
             );
       }
-      WidgetsFlutterBinding.ensureInitialized();
 
       FlutterError.onError = (FlutterErrorDetails details) {
         if (kReleaseMode) {
@@ -37,7 +32,7 @@ class ErrorHandler {
       if (kReleaseMode) {
         // report error
       } else {
-        app.get<Logger>().error('Uncaught exception.', error, stack);
+        logger.error('Uncaught exception.', error, stack);
       }
     });
   }

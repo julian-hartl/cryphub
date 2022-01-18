@@ -1,21 +1,20 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../../blocs/favorite_currencies/favorite_currencies_bloc.dart';
-import '../../../blocs/favorite_currencies_notifier/favorite_currencies_notifier_bloc.dart';
-import '../../../blocs/latest_currencies/latest_currencies_bloc.dart';
-import '../../../widgets/alerts.dart';
-import '../../../widgets/retry.dart';
-import '../../../../data/utils/converters.dart';
-import '../../../../domain/core/logger/logger.dart';
-import '../../../../domain/crypto_currency/crypto_currency.dart';
+import 'package:cryphub/data/logger/logger_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import '../../../../core/configure_dependencies.dart';
+import '../../../../data/utils/converters.dart';
+import '../../../../domain/crypto_currency/crypto_currency.dart';
+import '../../../blocs/favorite_currencies/favorite_currencies_bloc.dart';
+import '../../../blocs/favorite_currencies_notifier/favorite_currencies_notifier_bloc.dart';
+import '../../../blocs/latest_currencies/latest_currencies_bloc.dart';
 import '../../../themes.dart';
+import '../../../widgets/alerts.dart';
+import '../../../widgets/retry.dart';
 
-class LatestCurrenciesView extends StatelessWidget {
+class LatestCurrenciesView extends StatelessWidget with LoggerProvider {
   final PagingController<int, CryptoCurrency> pagingController;
 
   const LatestCurrenciesView({
@@ -29,9 +28,7 @@ class LatestCurrenciesView extends StatelessWidget {
       listener: (context, state) {
         state.when(
           loadingSuccess: (currencies, page) {
-            app
-                .get<Logger>()
-                .info('Loaded ${currencies.size} items for page $page');
+            logger.info('Loaded ${currencies.size} items for page $page');
             //when number of received items is lower than what should be displayed on a page, it is the last page
             final isLastPage = currencies.size < LatestCurrenciesBloc.pageSize;
             if (isLastPage) {

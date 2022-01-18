@@ -1,19 +1,18 @@
 import 'dart:convert';
 
-import '../../domain/core/logger/logger.dart';
-import '../../domain/settings/settings.dart';
-import '../../domain/settings/settings_repository.dart';
+import 'package:cryphub/data/logger/logger_provider.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../domain/settings/settings.dart';
+import '../../domain/settings/settings_repository.dart';
+
 @LazySingleton(as: ISettingsRepository)
-class SettingsRepository implements ISettingsRepository {
+class SettingsRepository with LoggerProvider implements ISettingsRepository {
   final SharedPreferences sharedPreferences;
-  final Logger logger;
 
   SettingsRepository(
     this.sharedPreferences,
-    this.logger,
   );
 
   Settings? _settings;
