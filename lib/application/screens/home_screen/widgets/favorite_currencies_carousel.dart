@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cryphub/application/widgets/shimmer_effect.dart';
 import 'package:cryphub/core/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -187,6 +188,7 @@ class _FavoriteCurrencyCardState extends State<FavoriteCurrencyCard> {
           setState(() {
             computedDominantColor = Future.value(value);
           });
+          // computeOnDominantColor();
         }).catchError((_) {
           setState(() {
             computedDominantColor =
@@ -198,42 +200,47 @@ class _FavoriteCurrencyCardState extends State<FavoriteCurrencyCard> {
     return FutureBuilder<Color>(
         future: computedDominantColor,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            final dominantColor = snapshot.data!;
-            final onDominantColor = computedOnDominantColor ?? Colors.white;
-            return Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
-              decoration: BoxDecoration(
+          final dominantColor = snapshot.data;
+          final onDominantColor = computedOnDominantColor;
+          if (dominantColor == null || onDominantColor == null) {
+            return ShimmerEffect(
+              child: Container(
+                decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10.0),
-                  color: dominantColor),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircleAvatar(
-                    child: Image.network(widget.favorite.iconUrl),
-                    radius: 35.0,
-                    backgroundColor: onDominantColor,
-                  ),
-                  const Gap(10),
-                  Text(
-                    widget.favorite.name,
-                    style: TextStyle(color: onDominantColor),
-                  ),
-                  const Gap(5),
-                  Text(
-                    '${convertCurrencyToSymbol(widget.favorite.currency)} ${widget.favorite.currentPrice.toStringAsFixed(2)}',
-                    style: TextStyle(color: onDominantColor),
-                  )
-                ],
+                  color: Colors.red,
+                ),
               ),
             );
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
           }
+          return Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10.0),
+              color: dominantColor,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  child: Image.network(widget.favorite.iconUrl),
+                  radius: 35.0,
+                  backgroundColor: onDominantColor,
+                ),
+                const Gap(10),
+                Text(
+                  widget.favorite.name,
+                  style: TextStyle(color: onDominantColor),
+                ),
+                const Gap(5),
+                Text(
+                  '${convertCurrencyToSymbol(widget.favorite.currency)} ${widget.favorite.currentPrice.toStringAsFixed(2)}',
+                  style: TextStyle(color: onDominantColor),
+                )
+              ],
+            ),
+          );
         });
   }
 }

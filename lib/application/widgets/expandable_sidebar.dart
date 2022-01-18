@@ -78,10 +78,43 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
 
   @override
   void initState() {
+    super.initState();
+
     sidebarAnimationController = AnimationController(
       vsync: this,
       duration: widget.duration,
     );
+
+    sidebarAnimationController.addListener(_onSidebarAnimationChanged);
+    expandableSidebarController =
+        widget.controller ?? ExpandableSidebarController();
+    expandableSidebarController.addListener(_onSidebarControllerChanged);
+    update();
+  }
+
+  void _onSidebarControllerChanged() {
+    if (!expandableSidebarController.isDoingManualSwipe) {
+      if (expandableSidebarController.isOpening) {
+        sidebarAnimationController.forward();
+      } else if (expandableSidebarController.isClosing) {
+        sidebarAnimationController.reverse();
+      }
+    }
+  }
+
+  void _onSidebarAnimationChanged() {
+    expandableSidebarController._setOpenedBy(sidebarAnimationController.value);
+  }
+
+  @override
+  void didUpdateWidget(covariant ExpandableSidebar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.curve != widget.curve || widget.angle != oldWidget.angle) {
+      update();
+    }
+  }
+
+  void update() {
     final curve = widget.curve;
     sidebarSlideUpAnimation = Tween<Offset>(
       begin: const Offset(0, 400),
@@ -115,24 +148,6 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
         CurvedAnimation(
             parent: sidebarAnimationController,
             curve: Interval(0.3, 1, curve: curve)));
-    expandableSidebarController =
-        widget.controller ?? ExpandableSidebarController();
-    expandableSidebarController.addListener(() {
-      if (!expandableSidebarController.isDoingManualSwipe) {
-        if (expandableSidebarController.isOpening) {
-          sidebarAnimationController.forward();
-        } else if (expandableSidebarController.isClosing) {
-          sidebarAnimationController.reverse();
-        }
-      }
-    });
-
-    sidebarAnimationController.addListener(() {
-      expandableSidebarController
-          ._setOpenedBy(sidebarAnimationController.value);
-    });
-
-    super.initState();
   }
 
   @override
@@ -141,6 +156,8 @@ class _ExpandableSidebarState extends State<ExpandableSidebar>
       try {
         expandableSidebarController.dispose();
       } catch (_) {}
+      sidebarAnimationController.removeListener(_onSidebarAnimationChanged);
+      expandableSidebarController.removeListener(_onSidebarControllerChanged);
     }
     super.dispose();
   }
