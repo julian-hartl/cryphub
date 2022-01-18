@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import '../../../configure_dependencies.dart';
+import '../../../core/configure_dependencies.dart';
 import '../../../domain/core/logger/logger.dart';
 import '../../../domain/crypto_currency/crypto_currency.dart';
 import '../../app_router.dart';

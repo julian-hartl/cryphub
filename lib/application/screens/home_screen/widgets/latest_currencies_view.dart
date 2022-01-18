@@ -12,8 +12,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import '../../../../configure_dependencies.dart';
-import '../../../../themes.dart';
+import '../../../../core/configure_dependencies.dart';
+import '../../../themes.dart';
 
 class LatestCurrenciesView extends StatelessWidget {
   final PagingController<int, CryptoCurrency> pagingController;

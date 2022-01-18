@@ -1,6 +1,6 @@
-import 'package:cryphub/config.dart';
-import 'package:cryphub/configure_dependencies.dart';
-import 'package:cryphub/constants.dart';
+import 'package:cryphub/core/config.dart';
+import 'package:cryphub/core/configure_dependencies.dart';
+import 'package:cryphub/core/constants.dart';
 import 'package:cryphub/data/crypto_currency/crypto_currency_cache.dart';
 import 'package:cryphub/data/crypto_currency/crypto_currency_repository.dart';
 import 'package:cryphub/data/utils/converters.dart';

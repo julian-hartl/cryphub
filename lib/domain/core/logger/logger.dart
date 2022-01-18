@@ -11,8 +11,8 @@ class Logger {
   }
 
   /// Log at message level error
-  void error(dynamic message) {
-    _log.e(message);
+  void error(dynamic message, [Object? error, StackTrace? stackTrace]) {
+    _log.e(message, error, stackTrace);
   }
 
   /// Log at message level warning

@@ -3,7 +3,7 @@ import '../../blocs/settings/settings_bloc.dart';
 import '../../blocs/settings_notifier/settings_notifier_bloc.dart';
 import '../../widgets/alerts.dart';
 import '../../widgets/retry.dart';
-import '../../../themes.dart';
+import '../../themes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

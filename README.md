@@ -4,7 +4,7 @@ Cryphub is an application that gives you a basic overview of different crypto cu
 
 ## Getting Started
 
-To run the application create `lib/config.dart` and add the following code:
+To run the application create `lib/core/config.dart` and add the following code:
 ```dart
 class _Config {
   const _Config();

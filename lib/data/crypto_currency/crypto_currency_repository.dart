@@ -1,9 +1,9 @@
-import 'package:cryphub/constants.dart';
+import 'package:cryphub/core/constants.dart';
 import 'package:cryphub/domain/network/network_response.dart';
 import 'package:cryphub/domain/network/network_service.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../config.dart';
+import '../../core/config.dart';
 import '../../domain/application_directories.dart';
 import '../../domain/core/api_exception.dart';
 import '../../domain/core/logger/logger.dart';
