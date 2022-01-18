@@ -207,9 +207,11 @@ class _FavoriteCurrencyCardState extends State<FavoriteCurrencyCard> {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10.0),
-                  color: Colors.red,
+                  color: Theme.of(context).colorScheme.surface,
                 ),
               ),
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              shimmerColor: Theme.of(context).colorScheme.secondary,
             );
           }
           return Container(

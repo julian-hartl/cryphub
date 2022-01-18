@@ -8,6 +8,7 @@ ThemeData dark(BuildContext context) => ThemeData(
         background: _darkBg,
         surface: Color(0xFF424342),
         primary: Color(0xFF31E384),
+        secondary: Color(0xFF484a48),
         onBackground: _darkOnBg,
       ),
       fontFamily: GoogleFonts.aBeeZee().fontFamily,
@@ -28,8 +29,9 @@ const _lightOnBg = Color(0xFF272829);
 ThemeData light(BuildContext context) => ThemeData(
       colorScheme: const ColorScheme.light(
           background: _lightBg,
-          surface: Color(0xFFD5D5D7),
+          surface: Color(0xFFEBEBF4),
           primary: Color(0xFF31E384),
+          secondary: Color(0xFFF4F4F4),
           onBackground: _lightOnBg),
       scaffoldBackgroundColor: _lightBg,
       appBarTheme: AppBarTheme(
