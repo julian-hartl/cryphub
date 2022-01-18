@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cryphub/application/widgets/favorite_button.dart';
 import 'package:cryphub/data/logger/logger_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -175,8 +176,9 @@ class CurrencyCard extends StatelessWidget {
               // https://stackoverflow.com/questions/53577962/better-way-to-load-images-from-network-flutter
               child: CachedNetworkImage(
                 imageUrl: cryptoCurrency.iconUrl,
-                placeholder: (context, url) =>
-                    const Center(child: CircularProgressIndicator()),
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
               ),
             ),
             const Gap(10),
@@ -229,56 +231,6 @@ class CurrencyCard extends StatelessWidget {
             ),
           )
         ],
-      ),
-    );
-  }
-}
-
-class FavoriteButton extends StatefulWidget {
-  const FavoriteButton({
-    Key? key,
-    required this.isFavorite,
-    required this.onTap,
-  }) : super(key: key);
-
-  final bool isFavorite;
-
-  /// Triggers every time it is tapped
-  /// Returns the current button state
-  final void Function(bool isFavorite) onTap;
-
-  @override
-  State<FavoriteButton> createState() => _FavoriteButtonState();
-}
-
-class _FavoriteButtonState extends State<FavoriteButton> {
-  late bool isFavorite;
-  @override
-  void initState() {
-    isFavorite = widget.isFavorite;
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          isFavorite = !isFavorite;
-        });
-        widget.onTap(isFavorite);
-      },
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 250),
-        child: isFavorite
-            ? const Icon(
-                Icons.favorite,
-                color: Colors.redAccent,
-              )
-            : Icon(
-                Icons.favorite_outline,
-                color: Theme.of(context).colorScheme.onBackground,
-              ),
       ),
     );
   }
