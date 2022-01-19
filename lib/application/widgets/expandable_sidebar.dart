@@ -11,7 +11,7 @@ class ExpandableSidebar extends StatefulWidget {
     this.angle = 0.0,
     this.yOffset = 0.0,
     this.openBySwipe = true,
-    this.stateChangeTrigger = 0.1,
+    this.stateChangeTrigger = 0.2,
     this.sidebarColor,
     this.curve = Curves.linear,
     this.backgroundColor,
@@ -41,7 +41,7 @@ class ExpandableSidebar extends StatefulWidget {
   /// Offsets the [child] on the y-axis.
   final double yOffset;
 
-  /// Determines wether the sidebar can be opened by swipe gestures or not.
+  /// Determines whether the sidebar can be opened by swipe gestures or not.
   ///
   /// Defaults to `true`
   final bool openBySwipe;
