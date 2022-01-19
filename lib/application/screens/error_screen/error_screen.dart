@@ -26,6 +26,7 @@ class ErrorScreen extends StatelessWidget {
             const Gap(10),
             ElevatedButton(
               onPressed: () {
+                // send report here
                 FlutterError.presentError(details);
                 exit(1);
               },

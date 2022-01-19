@@ -139,6 +139,7 @@ class SettingsScreenContent extends StatelessWidget {
   }
 }
 
+
 class OnOffSwitch extends StatefulWidget {
   const OnOffSwitch({
     Key? key,
