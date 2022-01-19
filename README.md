@@ -15,6 +15,8 @@ const config = _Config();
 ```
 Get your api key here: https://coinmarketcap.com/api/
 
+To resolve any dependency issues run `flutter pub get` and `flutter pub run build_runner watch --delete-conflicting-outputs`.
+
 ## UI
 ### Home screen without favorites
 ![Home screen without favorites](mocks/no_favorites.png)
