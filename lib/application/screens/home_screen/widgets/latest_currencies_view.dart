@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cryphub/application/widgets/favorite_button.dart';
 import 'package:cryphub/data/logger/logger_provider.dart';
 import 'package:flutter/material.dart';
@@ -149,6 +148,7 @@ class CurrencyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
+      key: ValueKey(cryptoCurrency.symbol),
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -203,7 +203,7 @@ class CurrencyCard extends StatelessWidget {
     );
   }
 
-  Container _growthRateBox() {
+  Row _growthRateBox() {
     final noGrowth =
         double.parse(cryptoCurrency.percentChange24h.toStringAsFixed(2)) ==
             0.00;
@@ -214,28 +214,26 @@ class CurrencyCard extends StatelessWidget {
     final icon = noGrowth
         ? Icons.horizontal_rule
         : (isPositiveGrowth ? Icons.arrow_upward : Icons.arrow_downward);
-    return Container(
-      child: Row(
-        children: [
-          Text(
-            '${cryptoCurrency.percentChange24h.toStringAsFixed(2)}%',
-            style: TextStyle(
-              // displays color depending on growth rate
-              color: color,
-            ),
+    return Row(
+      children: [
+        Text(
+          '${cryptoCurrency.percentChange24h.toStringAsFixed(2)}%',
+          style: TextStyle(
+            // displays color depending on growth rate
+            color: color,
           ),
-          const Gap(10),
-          Container(
-            decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-            padding: const EdgeInsets.all(6.0),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 15.0,
-            ),
-          )
-        ],
-      ),
+        ),
+        const Gap(10),
+        Container(
+          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+          padding: const EdgeInsets.all(6.0),
+          child: Icon(
+            icon,
+            color: Colors.white,
+            size: 15.0,
+          ),
+        )
+      ],
     );
   }
 }

@@ -213,11 +213,11 @@ class _FavoriteCurrencyCardState extends State<FavoriteCurrencyCard> with Logger
 
   static const cardBorderRadius = 10.0;
 
-
   @override
   Widget build(BuildContext context) {
 
     return FutureBuilder<Color>(
+        key: ValueKey(widget.favorite.symbol),
         future: computedDominantColor,
         builder: (context, snapshot) {
           final dominantColor = snapshot.data;
