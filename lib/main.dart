@@ -13,8 +13,7 @@ void main() async {
   if (kProfileMode) {
     // timeDilation = 5.0;
   }
-
-
+  
   await configureDependencies();
   ErrorHandler(child: Cryphub());
 }

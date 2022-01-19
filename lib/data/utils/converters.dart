@@ -7,9 +7,9 @@ String convertCurrencyToSymbol(Currency currency) {
   }
 }
 
-/// Converts a list to a [string] with their values seperated by commas
+/// Converts a list to a [string] with their values separated by commas
 /// For example: ['Hello', 'World'] would become Hello, World
-String seperateListValues<T extends Object?>(List<T> l) {
+String separateListValues<T extends Object?>(List<T> l) {
   String result = '';
   for (int i = 0; i < l.length; i++) {
     final isLastElement = i == l.length - 1;

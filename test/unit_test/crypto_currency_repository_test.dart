@@ -121,7 +121,7 @@ void main() {
       verify(
         networkService.get(
           url,
-          queryParameters: {'id': seperateListValues(quotesLatestIds)},
+          queryParameters: {'id': separateListValues(quotesLatestIds)},
           headers: {
             'X-CMC_PRO_API_KEY': config.coinMarketCapApiKey,
           },
@@ -164,7 +164,7 @@ void main() {
       verify(
         networkService.get(
           url,
-          queryParameters: {'symbol': seperateListValues(quotesLatestSymbols)},
+          queryParameters: {'symbol': separateListValues(quotesLatestSymbols)},
           headers: {
             'X-CMC_PRO_API_KEY': config.coinMarketCapApiKey,
           },

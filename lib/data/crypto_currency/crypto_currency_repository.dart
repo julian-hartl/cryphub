@@ -122,7 +122,7 @@ class CryptoCurrencyRepository
     if (cryptoCurrenciesIdentifieres.isEmpty) {
       return List.empty();
     }
-    final commaSeperated = seperateListValues(cryptoCurrenciesIdentifieres);
+    final commaSeperated = separateListValues(cryptoCurrenciesIdentifieres);
     final response = await getFromCurrencyApi(
       '/cryptocurrency/quotes/latest',
       queryParameters: {cryptoCurrenciesQueryParamter: commaSeperated},
