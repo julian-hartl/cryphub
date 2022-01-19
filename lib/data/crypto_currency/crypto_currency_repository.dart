@@ -42,14 +42,14 @@ class CryptoCurrencyRepository
             'limit': pageSize,
 
             /// Start is index from where items start to be returned
-            /// For example, when a list like `["Hello", "World"]` is present in the databas and `start` is 2,
+            /// For example, when a list like `["Hello", "World"]` is present in the database and `start` is 2,
             /// it will return ["World"]
             'start': (page - 1) * pageSize + 1,
           });
       checkResponse(response);
       final data = response.data['data'] as List;
       final latest =
-          data.map((json) => cryptoCurrencyFromApiReponse(json)).toList();
+          data.map((json) => cryptoCurrencyFromApiResponse(json)).toList();
       await cryptoCurrencyCache.cacheAndReplaceAll(latest);
       return latest;
     } catch (e, st) {
@@ -111,27 +111,27 @@ class CryptoCurrencyRepository
     }
   }
 
-  /// [cryptoCurrenciesQueryParamter] indicates which query paramter should be used to query crypto currencies.
+  /// [cryptoCurrenciesQueryParameter] indicates which query parameter should be used to query crypto currencies.
   ///
   /// Does not catch exceptions.
   ///
   /// See https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyQuotesLatest .
   Future<List<CryptoCurrency>> getCryptoCurrenciesBy(
-      List cryptoCurrenciesIdentifieres,
-      String cryptoCurrenciesQueryParamter) async {
-    if (cryptoCurrenciesIdentifieres.isEmpty) {
+      List cryptoCurrenciesIdentifiers,
+      String cryptoCurrenciesQueryParameter) async {
+    if (cryptoCurrenciesIdentifiers.isEmpty) {
       return List.empty();
     }
-    final commaSeperated = separateListValues(cryptoCurrenciesIdentifieres);
+    final commaSeparated = separateListValues(cryptoCurrenciesIdentifiers);
     final response = await getFromCurrencyApi(
       '/cryptocurrency/quotes/latest',
-      queryParameters: {cryptoCurrenciesQueryParamter: commaSeperated},
+      queryParameters: {cryptoCurrenciesQueryParameter: commaSeparated},
     );
     checkResponse(response);
 
     final data = response.data['data'] as Map<String, dynamic>;
     final currencies = data.entries
-        .map((entry) => cryptoCurrencyFromApiReponse(entry.value))
+        .map((entry) => cryptoCurrencyFromApiResponse(entry.value))
         .toList();
     return currencies;
   }
@@ -148,7 +148,7 @@ class CryptoCurrencyRepository
     );
   }
 
-  /// Checks wether the request was successful or not.
+  /// Checks whether the request was successful or not.
   ///
   /// Throws an [ApiException] when it was not successful.
   ///
@@ -161,7 +161,7 @@ class CryptoCurrencyRepository
   }
 
   /// To see format in which the data is returned from the api, visit: https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyListingsHistorical
-  CryptoCurrency cryptoCurrencyFromApiReponse(Map<String, dynamic> json) {
+  CryptoCurrency cryptoCurrencyFromApiResponse(Map<String, dynamic> json) {
     final id = json['id'];
     return CryptoCurrency(
       currentPrice: json['quote']['USD']['price'],
@@ -177,7 +177,7 @@ class CryptoCurrencyRepository
     );
   }
 
-  /// Returns the error messsage from returned [data]
+  /// Returns the error message from returned [data]
   String? errorMessageFromApiError(dynamic data) {
     final String? errorMessage = data['status']['error_message'];
     return errorMessage;
